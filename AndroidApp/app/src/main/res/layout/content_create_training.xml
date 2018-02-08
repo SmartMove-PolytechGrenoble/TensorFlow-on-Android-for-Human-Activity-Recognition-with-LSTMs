@@ -8,15 +8,6 @@
     android:paddingTop="60dp"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Create training"
-        android:textAlignment="center"
-        android:textSize="30sp"
-        android:textStyle="bold" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="87dp"
@@ -31,7 +22,7 @@
         <EditText
             android:id="@+id/repetitionTextView"
             android:layout_width="131dp"
-            android:layout_height="34dp"
+            android:layout_height="50dp"
             android:layout_weight="1"
             android:ems="10"
             android:inputType="number" />
