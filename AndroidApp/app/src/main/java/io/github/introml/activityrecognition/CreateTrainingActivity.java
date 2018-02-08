@@ -9,9 +9,16 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
+import BusinessClass.Exercice;
+import BusinessClass.Movement;
+import BusinessClass.Training;
+import BusinessClass.TrainingAdapter;
+
 public class CreateTrainingActivity extends AppCompatActivity {
 
     private Spinner movementSpinner;
+
+    private Training training;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +36,12 @@ public class CreateTrainingActivity extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
         movementSpinner.setAdapter(adapter);
+
+
+        training=new Training();
+        training.addExercice(new Exercice(Movement.SITTING, 1));
+
+        TrainingAdapter<Exercice> trainingAdapter = new Arr
     }
 
 }
