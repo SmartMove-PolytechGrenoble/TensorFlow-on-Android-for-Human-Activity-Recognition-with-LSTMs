@@ -12,6 +12,7 @@ import android.widget.Button;
 public class HomeActivity extends AppCompatActivity {
 
     private Button goToFreeModeButton ;
+    private Button goToCreatingModeButton ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +26,15 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(HomeActivity.this, FreeModeActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        goToCreatingModeButton = (Button) findViewById(R.id.goToCreateModeButton);
+        goToCreatingModeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(HomeActivity.this, CreateTrainingActivity.class);
                 startActivity(intent);
             }
         });
