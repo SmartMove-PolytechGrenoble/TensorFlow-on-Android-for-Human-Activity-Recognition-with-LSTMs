@@ -24,7 +24,7 @@ public class HomeActivity extends AppCompatActivity {
         goToFreeModeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(HomeActivity.this, MainActivity.class);
+                Intent intent = new Intent(HomeActivity.this, FreeModeActivity.class);
                 startActivity(intent);
             }
         });

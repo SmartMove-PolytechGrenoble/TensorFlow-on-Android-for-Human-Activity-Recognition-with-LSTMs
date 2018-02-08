@@ -17,7 +17,7 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity implements SensorEventListener, TextToSpeech.OnInitListener {
+public class FreeModeActivity extends AppCompatActivity implements SensorEventListener, TextToSpeech.OnInitListener {
 
     private static final int N_SAMPLES = 200;
     private static List<Float> x;
@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_freemode);
         x = new ArrayList<>();
         y = new ArrayList<>();
         z = new ArrayList<>();
