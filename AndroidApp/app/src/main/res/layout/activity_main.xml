@@ -161,5 +161,26 @@
                 android:textAlignment="center"
                 android:textSize="18sp" />
         </TableRow>
+
+        <TableRow
+            android:id="@+id/mostLikely_row"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="22dp">
+
+            <TextView
+                android:id="@+id/mostLikely_title"
+                android:layout_weight="1"
+                android:text="@string/mostLikely"
+                android:textAlignment="center"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/mostLikely_activity"
+                android:layout_weight="1"
+                android:textAlignment="center"
+                android:textSize="18sp" />
+        </TableRow>
     </TableLayout>
 </ScrollView>

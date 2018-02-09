@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -30,6 +32,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private TextView standingTextView;
     private TextView upstairsTextView;
     private TextView walkingTextView;
+
+    private TextView mostLikelyTextView;
+
     private TextToSpeech textToSpeech;
     private float[] results;
     private TensorFlowClassifier classifier;
@@ -52,6 +57,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         walkingTextView = (TextView) findViewById(R.id.walking_prob);
 
         classifier = new TensorFlowClassifier(getApplicationContext());
+
+        mostLikelyTextView = (TextView) findViewById(R.id.mostLikely_activity);
 
         textToSpeech = new TextToSpeech(this, this);
         textToSpeech.setLanguage(Locale.US);
@@ -119,10 +126,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             upstairsTextView.setText(Float.toString(round(results[4], 2)));
             walkingTextView.setText(Float.toString(round(results[5], 2)));
 
+            mostLikelyTextView.setText(mostLikely(results));
+
             x.clear();
             y.clear();
             z.clear();
         }
+    }
+
+    private String mostLikely(float[] results) {
+        int mostLikely = 0;
+
+        for (int i = 0; i < results.length; i++){
+            if (results[i] > results[mostLikely]){
+                mostLikely = i;
+            }
+        }
+
+        return labels[mostLikely];
     }
 
     private float[] toFloatArray(List<Float> list) {
