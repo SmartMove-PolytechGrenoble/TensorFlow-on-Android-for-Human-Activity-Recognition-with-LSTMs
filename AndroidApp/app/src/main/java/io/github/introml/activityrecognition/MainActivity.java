@@ -18,6 +18,7 @@ import java.util.Locale;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener, TextToSpeech.OnInitListener {
 
@@ -40,6 +41,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private TensorFlowClassifier classifier;
 
     private String[] labels = {"Downstairs", "Jogging", "Sitting", "Standing", "Upstairs", "Walking"};
+
+    private static int currentMove = -1;
+    private static long currentMoveTime = 0;
+    private static long currentMoveStartTime = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,7 +131,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             upstairsTextView.setText(Float.toString(round(results[4], 2)));
             walkingTextView.setText(Float.toString(round(results[5], 2)));
 
-            mostLikelyTextView.setText(mostLikely(results));
+            int mostLikely = mostLikely(results);
+
+            if (mostLikely != currentMove) {
+                currentMove = mostLikely;
+                currentMoveStartTime = System.nanoTime();
+            }
+
+            currentMoveTime = (currentMoveStartTime - System.nanoTime()) / 1000000;
+
+            mostLikelyTextView.setText(labels[mostLikely] + currentMoveTime + "ms");
 
             x.clear();
             y.clear();
@@ -134,7 +148,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
-    private String mostLikely(float[] results) {
+    /* Returns the label number of the most probable current move */
+    private int mostLikely(float[] results) {
         int mostLikely = 0;
 
         for (int i = 0; i < results.length; i++){
@@ -143,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         }
 
-        return labels[mostLikely];
+        return mostLikely;
     }
 
     private float[] toFloatArray(List<Float> list) {
