@@ -8,6 +8,14 @@
     android:paddingTop="60dp"
     android:orientation="vertical" >
 
+    <EditText
+        android:id="@+id/trainingNameTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Training name"
+        android:inputType="textPersonName" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="87dp"
@@ -36,6 +44,7 @@
     </LinearLayout>
 
     <ListView
+        android:id="@+id/exercicesListView"
         android:layout_width="match_parent"
         android:layout_height="322dp" />
 

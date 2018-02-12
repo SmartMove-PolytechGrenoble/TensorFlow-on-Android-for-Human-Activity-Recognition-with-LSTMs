@@ -36,7 +36,7 @@ public class TrainingAdapter extends ArrayAdapter<Exercice>{
 
         //getItem(position) va récupérer l'item [position] de la List<Tweet> tweets
         Exercice exercice = getItem(position);
-        viewHolder.repetion.setText(exercice.getRepetition());
+        viewHolder.repetion.setText(String.valueOf(exercice.getRepetition()));
         viewHolder.movement.setText(exercice.getMovement().toString());
 
         return convertView;

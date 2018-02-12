@@ -11,11 +11,11 @@
     <string name="title_activity_home">HomeActivity</string>
     <string name="title_activity_create_training">CreateTrainingActivity</string>
     <string-array name="movements">
-        <item>downstairs</item>
-        <item>jogging</item>
-        <item>sitting</item>
-        <item>standing</item>
-        <item>upstairs</item>
-        <item>walking</item>
+        <item>Downstairs</item>
+        <item>Jogging</item>
+        <item>Sitting</item>
+        <item>Standing</item>
+        <item>Upstairs</item>
+        <item>Walking</item>
     </string-array>
 </resources>
