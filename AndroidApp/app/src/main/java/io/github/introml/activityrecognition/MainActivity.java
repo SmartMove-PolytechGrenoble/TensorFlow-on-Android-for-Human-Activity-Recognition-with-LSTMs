@@ -41,6 +41,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private TensorFlowClassifier classifier;
 
     private String[] labels = {"Downstairs", "Jogging", "Sitting", "Standing", "Upstairs", "Walking"};
+    /* This array is init with zeros */
+    private int[] motionCounter = new int[labels.length];
+    /* This is the threshhold to accept a move */
+    private static final double validation = 0.8;
+
 
     private static int currentMove = -1;
     private static long currentMoveTime = 0;
@@ -133,14 +138,27 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
             int mostLikely = mostLikely(results);
 
+            if(results[mostLikely] < validation){
+                mostLikely = -1;
+                mostLikelyTextView.setText("Not recognized");
+            }
+
             if (mostLikely != currentMove) {
+                if(0 <= mostLikely){
+                    motionCounter[mostLikely]++;
+                }
                 currentMove = mostLikely;
                 currentMoveStartTime = System.nanoTime();
             }
 
             currentMoveTime = (currentMoveStartTime - System.nanoTime()) / 1000000;
 
-            mostLikelyTextView.setText(labels[mostLikely] + currentMoveTime + "ms");
+            if(mostLikely != -1){
+                mostLikelyTextView.setText(labels[mostLikely] + " " + currentMoveTime + "ms : " + motionCounter[mostLikely]);
+            }
+            else{
+                mostLikelyTextView.setText("Not recognized for " + currentMoveTime + "ms");
+            }
 
             x.clear();
             y.clear();
