@@ -13,7 +13,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".FreeModeActivity"></activity>
+        <activity android:name=".FreeModeActivity" />
         <activity
             android:name=".HomeActivity"
             android:label="@string/title_activity_home"
@@ -27,7 +27,8 @@
         <activity
             android:name=".CreateTrainingActivity"
             android:label="@string/title_activity_create_training"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".TrainingListActivity"></activity>
     </application>
 
 </manifest>

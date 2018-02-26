@@ -7,23 +7,31 @@
     android:paddingRight="16dp"
     android:paddingTop="60dp"
     android:orientation="vertical">
+
     <Button
         android:id="@+id/goToFreeModeButton"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Free mode"
+        tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="137dp"
-        tools:layout_editor_absoluteY="96dp"
-        tools:ignore="MissingConstraints" />
+        tools:layout_editor_absoluteY="96dp" />
 
     <Button
         android:id="@+id/goToCreateModeButton"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Create training"
         android:textAlignment="center"
         tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="137dp"
         tools:layout_editor_absoluteY="96dp" />
+
+    <Button
+        android:id="@+id/goToTrainingListActivity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Button"
+        tools:text="List of training" />
 
 </LinearLayout>
