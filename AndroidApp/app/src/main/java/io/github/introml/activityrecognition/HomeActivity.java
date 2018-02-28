@@ -13,6 +13,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private Button goToFreeModeButton ;
     private Button goToCreatingModeButton ;
+    private Button goToTrainingListActivity ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,14 +40,16 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+
+        goToTrainingListActivity = (Button) findViewById(R.id.goToTrainingListActivity);
+        goToTrainingListActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent intent = new Intent(HomeActivity.this, TrainingListActivity.class);
+                startActivity(intent);
             }
         });
+
     }
 
 }

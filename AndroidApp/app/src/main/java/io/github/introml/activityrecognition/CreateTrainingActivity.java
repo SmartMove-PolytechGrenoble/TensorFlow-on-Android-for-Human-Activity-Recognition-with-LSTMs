@@ -3,8 +3,10 @@ package io.github.introml.activityrecognition;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -13,6 +15,8 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Map;
 
 import BusinessClass.Exercice;
 import BusinessClass.Movement;
@@ -44,23 +48,19 @@ public class CreateTrainingActivity extends AppCompatActivity {
         movementSpinner = (Spinner) findViewById(R.id.movementSpinner);
 
         // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.movements, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.movements, android.R.layout.simple_spinner_item);
         // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
         movementSpinner.setAdapter(adapter);
 
-
-
         trainingListView = (ListView) findViewById(R.id.exercicesListView);
 
         createTraining();
 
-
         movementSpinner = (Spinner) findViewById(R.id.movementSpinner);
         repetitionTextView = (TextView) findViewById(R.id.repetitionTextView);
-        trainingNameTextView = (TextView) findViewById(R.id.saveTrainingButton);
+        trainingNameTextView = (TextView) findViewById(R.id.trainingNameTextView);
 
         addExerciceButton = (Button) findViewById(R.id.addTrainingButton);
         addExerciceButton.setOnClickListener(new View.OnClickListener() {
@@ -90,13 +90,23 @@ public class CreateTrainingActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 SharedPreferences.Editor editor = sharedPref.edit();
 
-                String trainingName = (String) trainingNameTextView.getText();
+                String trainingName = trainingNameTextView.getText().toString();
+                training.setName(trainingName);
 
                 editor.putString("TRAINING" + trainingName, training.getGSON(trainingName));
                 editor.commit();
+
+
+
+
+                Map<String,?> keys = sharedPref.getAll();
+                Log.e("Test", "Bite");
+                for(Map.Entry<String,?> entry : keys.entrySet()){
+                    Log.e("map values",entry.getKey() + ": " + entry.getValue().toString());
+                }
 
                 Context context = getApplicationContext();
                 CharSequence text = "Traning " + trainingName + " saved";

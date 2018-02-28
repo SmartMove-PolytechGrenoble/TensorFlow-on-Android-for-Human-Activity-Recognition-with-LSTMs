@@ -31,7 +31,7 @@
         android:id="@+id/goToTrainingListActivity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Button"
+        android:text="List of training"
         tools:text="List of training" />
 
 </LinearLayout>

@@ -54,4 +54,8 @@ public class Training {
     public void setName(String name) {
         this.trainingName = name;
     }
+
+    public String getName() {
+        return trainingName;
+    }
 }
