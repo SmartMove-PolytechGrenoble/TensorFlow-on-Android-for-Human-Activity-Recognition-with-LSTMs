@@ -24,5 +24,7 @@ def gather_data_csv():
             df['timestamp'] += last_stamp
             adf = pd.concat([adf, df], axis = 0)
             last_stamp = adf.tail(1)['timestamp'].item()
+
+    os.chdir("..")
             
     return adf
