@@ -20,36 +20,32 @@ import java.util.TimerTask;
 public class MainActivity extends AppCompatActivity implements SensorEventListener, TextToSpeech.OnInitListener {
 
     private static final int N_SAMPLES = 200;
-    private static List<Float> x;
-    private static List<Float> y;
-    private static List<Float> z;
-    private TextView downstairsTextView;
+    private static List<Float> xa;
+    private static List<Float> ya;
+    private static List<Float> za;
+    private static List<Float> xr;
+    private static List<Float> yr;
+    private TextView headbangTextView;
 
-    private TextView joggingTextView;
-    private TextView sittingTextView;
-    private TextView standingTextView;
-    private TextView upstairsTextView;
-    private TextView walkingTextView;
+    private TextView deboutTextView;
     private TextToSpeech textToSpeech;
     private float[] results;
     private TensorFlowClassifier classifier;
 
-    private String[] labels = {"Downstairs", "Jogging", "Sitting", "Standing", "Upstairs", "Walking"};
+    private String[] labels = {"Headbang", "Debout"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        x = new ArrayList<>();
-        y = new ArrayList<>();
-        z = new ArrayList<>();
+        xa = new ArrayList<>();
+        ya = new ArrayList<>();
+        za = new ArrayList<>();
+        xr = new ArrayList<>();
+        yr = new ArrayList<>();
 
-        downstairsTextView = (TextView) findViewById(R.id.downstairs_prob);
-        joggingTextView = (TextView) findViewById(R.id.jogging_prob);
-        sittingTextView = (TextView) findViewById(R.id.sitting_prob);
-        standingTextView = (TextView) findViewById(R.id.standing_prob);
-        upstairsTextView = (TextView) findViewById(R.id.upstairs_prob);
-        walkingTextView = (TextView) findViewById(R.id.walking_prob);
+        headbangTextView = (TextView) findViewById(R.id.headbang_prob);
+        deboutTextView = (TextView) findViewById(R.id.debout_prob);
 
         classifier = new TensorFlowClassifier(getApplicationContext());
 
@@ -87,15 +83,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     protected void onResume() {
         super.onResume();
-        getSensorManager().registerListener(this, getSensorManager().getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_GAME);
+        getSensorManager().registerListener(this, getSensorManager().getDefaultSensor(Sensor.TYPE_ACCELEROMETER), 10000);
+        getSensorManager().registerListener(this, getSensorManager().getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR), 10000);
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
         activityPrediction();
-        x.add(event.values[0]);
-        y.add(event.values[1]);
-        z.add(event.values[2]);
+
+        if(event.sensor.getType() != 11) {
+            xa.add(event.values[0]);
+            ya.add(event.values[1]);
+            za.add(event.values[2]);
+        }
+        else{
+            xr.add(event.values[0]);
+            yr.add(event.values[1]);
+        }
+
     }
 
     @Override
@@ -104,24 +109,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     private void activityPrediction() {
-        if (x.size() == N_SAMPLES && y.size() == N_SAMPLES && z.size() == N_SAMPLES) {
+        if (xr.size() == N_SAMPLES && yr.size() == N_SAMPLES) {
             List<Float> data = new ArrayList<>();
-            data.addAll(x);
-            data.addAll(y);
-            data.addAll(z);
+            data.addAll(xa);
+            data.addAll(ya);
+            data.addAll(za);
+            data.addAll(xr);
+            data.addAll(yr);
 
             results = classifier.predictProbabilities(toFloatArray(data));
 
-            downstairsTextView.setText(Float.toString(round(results[0], 2)));
-            joggingTextView.setText(Float.toString(round(results[1], 2)));
-            sittingTextView.setText(Float.toString(round(results[2], 2)));
-            standingTextView.setText(Float.toString(round(results[3], 2)));
-            upstairsTextView.setText(Float.toString(round(results[4], 2)));
-            walkingTextView.setText(Float.toString(round(results[5], 2)));
+            headbangTextView.setText(Float.toString(round(results[0], 2)));
+            deboutTextView.setText(Float.toString(round(results[1], 2)));
 
-            x.clear();
-            y.clear();
-            z.clear();
+            xa.clear();
+            ya.clear();
+            za.clear();
+            xr.clear();
+            yr.clear();
         }
     }
 
