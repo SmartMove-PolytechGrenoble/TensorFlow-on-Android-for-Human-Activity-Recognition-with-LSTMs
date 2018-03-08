@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -26,19 +27,25 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private static List<Float> xa;
     private static List<Float> ya;
     private static List<Float> za;
-    //private static List<Float> xr;
-    //private static List<Float> yr;
-    //private static List<Float> zr;
+    private static List<Float> xr;
+    private static List<Float> yr;
+    private static List<Float> zr;
 
-    private TextView headbangTextView;
+    private HashMap<Integer, TextView> moveToCountIdx = new HashMap<Integer, TextView>();
+
+    private TextView marcherTextView;
     private TextView rienTextView;
-    private TextView deboutTextView;
+    private TextView sauterTextView;
     private TextView mostLikelyTextView;
+    private TextView sauterCountTextView;
     private TextToSpeech textToSpeech;
     private float[] results;
     private TensorFlowClassifier classifier;
 
     private String[] labels = {"Marcher", "Rien", "Sauter"};
+    /* Move indexes to count */
+    private List moveToCount = new ArrayList<>();
+
     private int[] motionCounter = new int[labels.length];
     /* This array is init with zeros */
     /* This is the threshhold to accept a move */
@@ -56,13 +63,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         xa = new ArrayList<>();
         ya = new ArrayList<>();
         za = new ArrayList<>();
-        //xr = new ArrayList<>();
-        //yr = new ArrayList<>();
-        //zr = new ArrayList<>();
+        xr = new ArrayList<>();
+        yr = new ArrayList<>();
+        zr = new ArrayList<>();
+
+
 
         rienTextView = (TextView) findViewById(R.id.rien_prob);
-        deboutTextView = (TextView) findViewById(R.id.debout_prob);
-        headbangTextView = (TextView) findViewById(R.id.headbang_prob);
+        sauterTextView = (TextView) findViewById(R.id.sauter_prob);
+        marcherTextView = (TextView) findViewById(R.id.marcher_prob);
+        sauterCountTextView = (TextView) findViewById(R.id.sauter_count);
+
+        moveToCount.add(2);
+        moveToCountIdx.put(2, sauterCountTextView);
 
         classifier = new TensorFlowClassifier(getApplicationContext());
 
@@ -90,9 +103,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     }
                 }
 
+//                textToSpeech.speak(String.valueOf(motionCounter[idx]), TextToSpeech.QUEUE_ADD, null, Integer.toString(new Random().nextInt()));
                 textToSpeech.speak(labels[idx], TextToSpeech.QUEUE_ADD, null, Integer.toString(new Random().nextInt()));
             }
-        }, 2000, 5000);
+        }, 2000, 3000);
     }
 
     protected void onPause() {
@@ -103,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     protected void onResume() {
         super.onResume();
         getSensorManager().registerListener(this, getSensorManager().getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION), 10000);
-        //getSensorManager().registerListener(this, getSensorManager().getDefaultSensor(Sensor.TYPE_GRAVITY), 10000);
+//        getSensorManager().registerListener(this, getSensorManager().getDefaultSensor(Sensor.TYPE_GRAVITY), 10000);
     }
 
     @Override
@@ -118,11 +132,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         }
         else{
-            /*if(xr.size() < N_SAMPLES) {
-                xr.add(event.values[0]);
-                yr.add(event.values[1]);
-                zr.add(event.values[2]);
-            }*/
+//            if(xr.size() < N_SAMPLES) {
+//                xr.add(event.values[0]);
+//                yr.add(event.values[1]);
+//                zr.add(event.values[2]);
+//            }
         }
 
     }
@@ -144,8 +158,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
             results = classifier.predictProbabilities(toFloatArray(data));
 
-            headbangTextView.setText(Float.toString(round(results[0], 2)));
-            deboutTextView.setText(Float.toString(round(results[2], 2)));
+            marcherTextView.setText(Float.toString(round(results[0], 2)));
+            sauterTextView.setText(Float.toString(round(results[2], 2)));
             rienTextView.setText(Float.toString(round(results[1], 2)));
 
             int mostLikely = mostLikely(results);
@@ -166,15 +180,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             currentMoveTime = (currentMoveStartTime - System.nanoTime()) / 1000000;
 
             if(mostLikely != -1){
+                if(moveToCountIdx.containsKey(mostLikely)){
+                    moveToCountIdx.get(mostLikely).setText(Integer.toString(motionCounter[mostLikely]));
+                }
+
                 mostLikelyTextView.setText(labels[mostLikely] + " " + currentMoveTime + "ms : " + motionCounter[mostLikely]);
             }
             else{
                 mostLikelyTextView.setText("Not recognized for " + currentMoveTime + "ms");
             }
 
-//            zr.clear();
-//            yr.clear();
-//            xr.clear();
+            zr.clear();
+            yr.clear();
+            xr.clear();
             za.clear();
             ya.clear();
             xa.clear();

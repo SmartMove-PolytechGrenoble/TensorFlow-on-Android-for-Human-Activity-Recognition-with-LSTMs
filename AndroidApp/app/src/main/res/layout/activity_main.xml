@@ -37,13 +37,13 @@
         </TableRow>
 
         <TableRow
-            android:id="@+id/headbang_row"
+            android:id="@+id/marcher_row"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:padding="22dp">
 
             <TextView
-                android:id="@+id/headbang_title"
+                android:id="@+id/marcher_title"
                 android:layout_weight="1"
                 android:text="Marcher"
                 android:textAlignment="center"
@@ -51,20 +51,20 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/headbang_prob"
+                android:id="@+id/marcher_prob"
                 android:layout_weight="1"
                 android:textAlignment="center"
                 android:textSize="18sp" />
         </TableRow>
 
         <TableRow
-            android:id="@+id/debout_row"
+            android:id="@+id/sauter_row"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:padding="22dp">
 
             <TextView
-                android:id="@+id/debout_title"
+                android:id="@+id/sauter_title"
                 android:layout_weight="1"
                 android:text="Sauter"
                 android:textAlignment="center"
@@ -72,7 +72,7 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/debout_prob"
+                android:id="@+id/sauter_prob"
                 android:layout_weight="1"
                 android:textAlignment="center"
                 android:textSize="18sp" />
@@ -119,5 +119,27 @@
                 android:textAlignment="center"
                 android:textSize="18sp" />
         </TableRow>
+
+        <TableRow
+            android:id="@+id/sautercount_row"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:padding="22dp">
+
+            <TextView
+                android:id="@+id/sautercount_title"
+                android:layout_weight="1"
+                android:text="Compteur sauts"
+                android:textAlignment="center"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/sauter_count"
+                android:layout_weight="1"
+                android:textAlignment="center"
+                android:textSize="18sp" />
+        </TableRow>
+
     </TableLayout>
 </ScrollView>
