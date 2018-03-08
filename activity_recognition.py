@@ -6,6 +6,11 @@ Created on Tue Feb 27 17:59:59 2018
 @author: mesh
 """
 
+
+import os
+
+os.chdir("/home/mesh/S10/Orga_Git/TensorFlow-on-Android-for-Human-Activity-Recognition-with-LSTMs/")
+
 import pandas as pd
 import numpy as np
 import pickle
@@ -16,52 +21,55 @@ import seaborn as sns
 from pylab import rcParams
 from sklearn import metrics
 from sklearn.model_selection import train_test_split
-
+import formatdata as ft
 
 sns.set(style='whitegrid', palette='muted', font_scale=1.5)
 
 rcParams['figure.figsize'] = 14, 8
 
+N_SAMPLES = 100
 RANDOM_SEED = 42
 
 #à modifier selon la forme du CSV
-columns = ['user','activity','timestamp', 'x-axis', 'y-axis', 'z-axis']
-df = pd.read_csv('~/S10/Orga_Git/TensorFlow-on-Android-for-Human-Activity-Recognition-with-LSTMs/data/WISDM_ar_v1.1_raw.txt', header = None, names = columns)
+#columns = ['user','activity','timestamp', 'x-axis', 'y-axis', 'z-axis']
+#df = pd.read_csv('~/S10/Orga_Git/TensorFlow-on-Android-for-Human-Activity-Recognition-with-LSTMs/data/WISDM_ar_v1.1_raw.txt', header = None, names = columns)
+df = ft.gather_data_csv()
 df = df.dropna()
-
+df.info()
 #df.info()
 
 df['activity'].value_counts().plot(kind='bar', title='Training examples by activity type')
 
 df['user'].value_counts().plot(kind='bar', title='Training examples by user')
 
-
 def plot_activity(activity, df):
-    data = df[df['activity'] == activity][['x-axis', 'y-axis', 'z-axis', 'x-axis', 'y-axis', 'z-axis']][:200]
-    print(data)
+    #data = df[df['activity'] == activity][['x-acc', 'y-acc', 'z-acc', 'x-rot', 'y-rot', 'z-rot']][:N_SAMPLES]
+    data = df[df['activity'] == activity][['x-acc', 'y-acc', 'z-acc']][:400]
     axis = data.plot(subplots=True, figsize=(16, 12), 
                      title=activity)
     for ax in axis:
         ax.legend(loc='lower left', bbox_to_anchor=(1.0, 0.5))
         
         
-plot_activity("Sitting", df)
-plot_activity("Walking", df)
+plot_activity("Marcher", df)
+plot_activity("Sauter", df)
+plot_activity("Rien", df)
 
-N_TIME_STEPS = 200
-N_FEATURES = 6
+N_TIME_STEPS = N_SAMPLES
+N_FEATURES = 3
 step = 20
 segments = []
 labels = []
 for i in range(0, len(df) - N_TIME_STEPS, step):
-    xs = df['x-axis'].values[i: i + N_TIME_STEPS]
-    ys = df['y-axis'].values[i: i + N_TIME_STEPS]
-    zs = df['z-axis'].values[i: i + N_TIME_STEPS]
-    xg = df['x-axis'].values[i: i + N_TIME_STEPS]
-    yg = df['y-axis'].values[i: i + N_TIME_STEPS]
-    zg = df['z-axis'].values[i: i + N_TIME_STEPS]
+    xa = df['x-acc'].values[i: i + N_TIME_STEPS]
+    ya = df['y-acc'].values[i: i + N_TIME_STEPS]
+    za = df['z-acc'].values[i: i + N_TIME_STEPS]
+    #xr = df['x-rot'].values[i: i + N_TIME_STEPS]
+    #yr = df['y-rot'].values[i: i + N_TIME_STEPS]
+    #zr = df['z-rot'].values[i: i + N_TIME_STEPS]
     label = stats.mode(df['activity'][i: i + N_TIME_STEPS])[0][0]
-    segments.append([xs, ys, zs, xg, yg, zg])
+    #segments.append([xa, ya, za, xr, yr, zr])
+    segments.append([xa, ya, za])
     labels.append(label)
     
 np.array(segments).shape
@@ -84,7 +92,7 @@ len(X_train)
 len(X_test)
 
 ### BUILDING THE MODEL ###
-N_CLASSES = 6
+N_CLASSES = 3
 N_HIDDEN_UNITS = 64
 
 def create_LSTM_model(inputs):
@@ -137,8 +145,8 @@ correct_pred = tf.equal(tf.argmax(pred_softmax, 1), tf.argmax(Y, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_pred, dtype=tf.float32))
 
 ### TRAINING ###
-N_EPOCHS = 50
-BATCH_SIZE = 1024
+N_EPOCHS = 40
+BATCH_SIZE = 150
 
 saver = tf.train.Saver()
 
@@ -172,12 +180,13 @@ for i in range(1, N_EPOCHS + 1):
     if i != 1 and i % 10 != 0:
         continue
 
+    print(acc_test)
     print('epoch: {i} test accuracy: {acc_test} loss: {loss_test}')
     
 predictions, acc_final, loss_final = sess.run([pred_softmax, accuracy, loss], feed_dict={X: X_test, Y: y_test})
 
-print()
-print('final results: accuracy: {acc_final} loss: {loss_final}')
+print(acc_final)
+#print(f'final results: accuracy: {acc_final} loss: {loss_final}')
 
 pickle.dump(predictions, open("predictions.p", "wb"))
 pickle.dump(history, open("history.p", "wb"))
@@ -206,7 +215,7 @@ plt.ylim(0)
 
 plt.show()
 
-LABELS = ['Downstairs', 'Jogging', 'Sitting', 'Standing', 'Upstairs', 'Walking']
+LABELS = ['Marcher', 'Rien', 'Sauter']
 
 max_test = np.argmax(y_test, axis=1)
 max_predictions = np.argmax(predictions, axis=1)
@@ -220,7 +229,7 @@ plt.xlabel('Predicted label')
 plt.show()
 
 ### EXPORTING THE MODEL ###
-'''
+
 from tensorflow.python.tools import freeze_graph
 
 MODEL_NAME = 'har'
@@ -236,4 +245,3 @@ freeze_graph.freeze_graph(input_graph_path, input_saver="",
                           output_node_names="y_", restore_op_name="save/restore_all",
                           filename_tensor_name="save/Const:0", 
                           output_graph=output_frozen_graph_name, clear_devices=True, initializer_nodes="")
-'''

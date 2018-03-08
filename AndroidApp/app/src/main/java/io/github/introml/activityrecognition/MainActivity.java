@@ -19,20 +19,22 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener, TextToSpeech.OnInitListener {
 
-    private static final int N_SAMPLES = 200;
+    private static final int N_SAMPLES = 100;
     private static List<Float> xa;
     private static List<Float> ya;
     private static List<Float> za;
-    private static List<Float> xr;
-    private static List<Float> yr;
-    private TextView headbangTextView;
+    //private static List<Float> xr;
+    //private static List<Float> yr;
+    //private static List<Float> zr;
 
+    private TextView headbangTextView;
+    private TextView rienTextView;
     private TextView deboutTextView;
     private TextToSpeech textToSpeech;
     private float[] results;
     private TensorFlowClassifier classifier;
 
-    private String[] labels = {"Headbang", "Debout"};
+    private String[] labels = {"Marcher", "Rien", "Sauter"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,11 +43,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         xa = new ArrayList<>();
         ya = new ArrayList<>();
         za = new ArrayList<>();
-        xr = new ArrayList<>();
-        yr = new ArrayList<>();
+        //xr = new ArrayList<>();
+        //yr = new ArrayList<>();
+        //zr = new ArrayList<>();
 
-        headbangTextView = (TextView) findViewById(R.id.headbang_prob);
+        rienTextView = (TextView) findViewById(R.id.rien_prob);
         deboutTextView = (TextView) findViewById(R.id.debout_prob);
+        headbangTextView = (TextView) findViewById(R.id.headbang_prob);
 
         classifier = new TensorFlowClassifier(getApplicationContext());
 
@@ -83,22 +87,27 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     protected void onResume() {
         super.onResume();
-        getSensorManager().registerListener(this, getSensorManager().getDefaultSensor(Sensor.TYPE_ACCELEROMETER), 10000);
-        getSensorManager().registerListener(this, getSensorManager().getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR), 10000);
+        getSensorManager().registerListener(this, getSensorManager().getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION), 10000);
+        //getSensorManager().registerListener(this, getSensorManager().getDefaultSensor(Sensor.TYPE_GRAVITY), 10000);
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
         activityPrediction();
 
-        if(event.sensor.getType() != 11) {
-            xa.add(event.values[0]);
-            ya.add(event.values[1]);
-            za.add(event.values[2]);
+        if(event.sensor.getType() != 9) {
+            if(xa.size() < N_SAMPLES) {
+                xa.add(event.values[0]);
+                ya.add(event.values[1]);
+                za.add(event.values[2]);
+            }
         }
         else{
-            xr.add(event.values[0]);
-            yr.add(event.values[1]);
+            /*if(xr.size() < N_SAMPLES) {
+                xr.add(event.values[0]);
+                yr.add(event.values[1]);
+                zr.add(event.values[2]);
+            }*/
         }
 
     }
@@ -109,24 +118,27 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     private void activityPrediction() {
-        if (xr.size() == N_SAMPLES && yr.size() == N_SAMPLES) {
+        if (xa.size() >= N_SAMPLES && ya.size() >= N_SAMPLES && za.size() >= N_SAMPLES) {
             List<Float> data = new ArrayList<>();
             data.addAll(xa);
             data.addAll(ya);
             data.addAll(za);
-            data.addAll(xr);
-            data.addAll(yr);
+//            data.addAll(xr);
+//            data.addAll(yr);
+//            data.addAll(zr);
 
             results = classifier.predictProbabilities(toFloatArray(data));
 
             headbangTextView.setText(Float.toString(round(results[0], 2)));
-            deboutTextView.setText(Float.toString(round(results[1], 2)));
+            deboutTextView.setText(Float.toString(round(results[2], 2)));
+            rienTextView.setText(Float.toString(round(results[1], 2)));
 
             xa.clear();
             ya.clear();
             za.clear();
-            xr.clear();
-            yr.clear();
+//            xr.clear();
+//            yr.clear();
+//            zr.clear();
         }
     }
 

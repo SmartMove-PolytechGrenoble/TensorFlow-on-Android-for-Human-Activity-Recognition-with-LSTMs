@@ -45,7 +45,7 @@
             <TextView
                 android:id="@+id/headbang_title"
                 android:layout_weight="1"
-                android:text="Headbang"
+                android:text="Marcher"
                 android:textAlignment="center"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -66,13 +66,34 @@
             <TextView
                 android:id="@+id/debout_title"
                 android:layout_weight="1"
-                android:text="Debout"
+                android:text="Sauter"
                 android:textAlignment="center"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/debout_prob"
+                android:layout_weight="1"
+                android:textAlignment="center"
+                android:textSize="18sp" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/rien_row"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:padding="22dp">
+
+            <TextView
+                android:id="@+id/rien_title"
+                android:layout_weight="1"
+                android:text="rien"
+                android:textAlignment="center"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/rien_prob"
                 android:layout_weight="1"
                 android:textAlignment="center"
                 android:textSize="18sp" />

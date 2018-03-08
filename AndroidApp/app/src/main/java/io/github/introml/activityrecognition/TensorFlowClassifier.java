@@ -11,13 +11,13 @@ public class TensorFlowClassifier {
     }
 
     private TensorFlowInferenceInterface inferenceInterface;
-    private static final String MODEL_FILE = "file:///android_asset/frozen_model.pb";
-//    private static final String MODEL_FILE = "file:///android_asset/frozen_har.pb";
+//    private static final String MODEL_FILE = "file:///android_asset/frozen_model.pb";
+    private static final String MODEL_FILE = "file:///android_asset/frozen_har.pb";
     private static final String INPUT_NODE = "input";
     private static final String[] OUTPUT_NODES = {"y_"};
     private static final String OUTPUT_NODE = "y_";
-    private static final long[] INPUT_SIZE = {1, 200, 5};
-    private static final int OUTPUT_SIZE = 2;
+    private static final long[] INPUT_SIZE = {1, 100, 3};
+    private static final int OUTPUT_SIZE = 3;
 
     public TensorFlowClassifier(final Context context) {
         inferenceInterface = new TensorFlowInferenceInterface(context.getAssets(), MODEL_FILE);
@@ -28,7 +28,7 @@ public class TensorFlowClassifier {
         inferenceInterface.feed(INPUT_NODE, data, INPUT_SIZE);
         inferenceInterface.run(OUTPUT_NODES);
         inferenceInterface.fetch(OUTPUT_NODE, result);
-
+        //Marcher Rien Sauter
         //Downstairs	Jogging	  Sitting	Standing	Upstairs	Walking
         return result;
     }
