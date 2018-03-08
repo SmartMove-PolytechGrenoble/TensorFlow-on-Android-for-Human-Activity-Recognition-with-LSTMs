@@ -11,11 +11,14 @@ import android.widget.TextView;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener, TextToSpeech.OnInitListener {
 
@@ -30,11 +33,21 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private TextView headbangTextView;
     private TextView rienTextView;
     private TextView deboutTextView;
+    private TextView mostLikelyTextView;
     private TextToSpeech textToSpeech;
     private float[] results;
     private TensorFlowClassifier classifier;
 
     private String[] labels = {"Marcher", "Rien", "Sauter"};
+    private int[] motionCounter = new int[labels.length];
+    /* This array is init with zeros */
+    /* This is the threshhold to accept a move */
+    private static final double validation = 0.8;
+
+
+    private static int currentMove = -1;
+    private static long currentMoveTime = 0;
+    private static long currentMoveStartTime = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +65,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         headbangTextView = (TextView) findViewById(R.id.headbang_prob);
 
         classifier = new TensorFlowClassifier(getApplicationContext());
+
+        mostLikelyTextView = (TextView) findViewById(R.id.mostLikely_activity);
 
         textToSpeech = new TextToSpeech(this, this);
         textToSpeech.setLanguage(Locale.US);
@@ -133,13 +148,50 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             deboutTextView.setText(Float.toString(round(results[2], 2)));
             rienTextView.setText(Float.toString(round(results[1], 2)));
 
-            xa.clear();
-            ya.clear();
-            za.clear();
-//            xr.clear();
-//            yr.clear();
+            int mostLikely = mostLikely(results);
+
+            if(results[mostLikely] < validation){
+                mostLikely = -1;
+                mostLikelyTextView.setText("Not recognized");
+            }
+
+            if (mostLikely != currentMove) {
+                if(0 <= mostLikely){
+                    motionCounter[mostLikely]++;
+                }
+                currentMove = mostLikely;
+                currentMoveStartTime = System.nanoTime();
+            }
+
+            currentMoveTime = (currentMoveStartTime - System.nanoTime()) / 1000000;
+
+            if(mostLikely != -1){
+                mostLikelyTextView.setText(labels[mostLikely] + " " + currentMoveTime + "ms : " + motionCounter[mostLikely]);
+            }
+            else{
+                mostLikelyTextView.setText("Not recognized for " + currentMoveTime + "ms");
+            }
+
 //            zr.clear();
+//            yr.clear();
+//            xr.clear();
+            za.clear();
+            ya.clear();
+            xa.clear();
         }
+    }
+
+    /* Returns the label number of the most probable current move */
+    private int mostLikely(float[] results) {
+        int mostLikely = 0;
+
+        for (int i = 0; i < results.length; i++){
+            if (results[i] > results[mostLikely]){
+                mostLikely = i;
+            }
+        }
+
+        return mostLikely;
     }
 
     private float[] toFloatArray(List<Float> list) {
