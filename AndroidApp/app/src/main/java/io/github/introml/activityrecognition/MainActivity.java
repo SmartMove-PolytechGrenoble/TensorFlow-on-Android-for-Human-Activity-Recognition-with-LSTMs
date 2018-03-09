@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 }
 
 //                textToSpeech.speak(String.valueOf(motionCounter[idx]), TextToSpeech.QUEUE_ADD, null, Integer.toString(new Random().nextInt()));
-                if(results[idx] > 0.95 && moveToCountIdx.containsKey(idx) && currentMoveEnd == 1) {
+                if(results[idx] > validation && moveToCountIdx.containsKey(idx) && currentMoveEnd == 1) {
                     textToSpeech.speak(labels[idx], TextToSpeech.QUEUE_ADD, null, Integer.toString(new Random().nextInt()));
                     currentMoveEnd = 0;
                 }
