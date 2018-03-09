@@ -23,6 +23,8 @@ import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener, TextToSpeech.OnInitListener {
 
+    private int currentMoveEnd = 1;
+    private static final boolean WITH_GYROSCOPE = false;
     private static final int N_SAMPLES = 100;
     private static List<Float> xa;
     private static List<Float> ya;
@@ -49,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private int[] motionCounter = new int[labels.length];
     /* This array is init with zeros */
     /* This is the threshhold to accept a move */
-    private static final double validation = 0.8;
+    private static final double validation = 0.98;
 
 
     private static int currentMove = -1;
@@ -104,7 +106,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 }
 
 //                textToSpeech.speak(String.valueOf(motionCounter[idx]), TextToSpeech.QUEUE_ADD, null, Integer.toString(new Random().nextInt()));
-                textToSpeech.speak(labels[idx], TextToSpeech.QUEUE_ADD, null, Integer.toString(new Random().nextInt()));
+                if(results[idx] > 0.95 && moveToCountIdx.containsKey(idx) && currentMoveEnd == 1) {
+                    textToSpeech.speak(labels[idx], TextToSpeech.QUEUE_ADD, null, Integer.toString(new Random().nextInt()));
+                    currentMoveEnd = 0;
+                }
             }
         }, 2000, 3000);
     }
@@ -117,14 +122,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     protected void onResume() {
         super.onResume();
         getSensorManager().registerListener(this, getSensorManager().getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION), 10000);
-//        getSensorManager().registerListener(this, getSensorManager().getDefaultSensor(Sensor.TYPE_GRAVITY), 10000);
+        if(WITH_GYROSCOPE) {
+            getSensorManager().registerListener(this, getSensorManager().getDefaultSensor(Sensor.TYPE_GYROSCOPE), 10000);
+        }
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
         activityPrediction();
 
-        if(event.sensor.getType() != 9) {
+        if(event.sensor.getType() != 4) {
             if(xa.size() < N_SAMPLES) {
                 xa.add(event.values[0]);
                 ya.add(event.values[1]);
@@ -132,11 +139,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         }
         else{
-//            if(xr.size() < N_SAMPLES) {
-//                xr.add(event.values[0]);
-//                yr.add(event.values[1]);
-//                zr.add(event.values[2]);
-//            }
+            if(xr.size() < N_SAMPLES && WITH_GYROSCOPE) {
+                xr.add(event.values[0]);
+                yr.add(event.values[1]);
+                zr.add(event.values[2]);
+            }
         }
 
     }
@@ -148,13 +155,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private void activityPrediction() {
         if (xa.size() >= N_SAMPLES && ya.size() >= N_SAMPLES && za.size() >= N_SAMPLES) {
+            if (WITH_GYROSCOPE && !(xr.size() >= N_SAMPLES && yr.size() >= N_SAMPLES && zr.size() >= N_SAMPLES)){
+                return;
+            }
             List<Float> data = new ArrayList<>();
             data.addAll(xa);
             data.addAll(ya);
             data.addAll(za);
-//            data.addAll(xr);
-//            data.addAll(yr);
-//            data.addAll(zr);
+            data.addAll(xr);
+            data.addAll(yr);
+            data.addAll(zr);
 
             results = classifier.predictProbabilities(toFloatArray(data));
 
@@ -182,6 +192,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             if(mostLikely != -1){
                 if(moveToCountIdx.containsKey(mostLikely)){
                     moveToCountIdx.get(mostLikely).setText(Integer.toString(motionCounter[mostLikely]));
+                }else{
+                    currentMoveEnd = 1;
                 }
 
                 mostLikelyTextView.setText(labels[mostLikely] + " " + currentMoveTime + "ms : " + motionCounter[mostLikely]);
