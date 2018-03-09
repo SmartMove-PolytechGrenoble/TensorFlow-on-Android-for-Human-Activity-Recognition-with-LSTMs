@@ -23,6 +23,8 @@ from sklearn import metrics
 from sklearn.model_selection import train_test_split
 import formatdata as ft
 
+WITH_GYROSCOPE = 0
+
 sns.set(style='whitegrid', palette='muted', font_scale=1.5)
 
 rcParams['figure.figsize'] = 14, 8
@@ -33,7 +35,7 @@ RANDOM_SEED = 42
 #à modifier selon la forme du CSV
 #columns = ['user','activity','timestamp', 'x-axis', 'y-axis', 'z-axis']
 #df = pd.read_csv('~/S10/Orga_Git/TensorFlow-on-Android-for-Human-Activity-Recognition-with-LSTMs/data/WISDM_ar_v1.1_raw.txt', header = None, names = columns)
-df = ft.gather_data_csv()
+df = ft.gather_data_csv(WITH_GYROSCOPE)
 df = df.dropna()
 df.info()
 #df.info()
@@ -43,8 +45,11 @@ df['activity'].value_counts().plot(kind='bar', title='Training examples by activ
 df['user'].value_counts().plot(kind='bar', title='Training examples by user')
 
 def plot_activity(activity, df):
-    #data = df[df['activity'] == activity][['x-acc', 'y-acc', 'z-acc', 'x-rot', 'y-rot', 'z-rot']][:N_SAMPLES]
-    data = df[df['activity'] == activity][['x-acc', 'y-acc', 'z-acc']][:400]
+    if(WITH_GYROSCOPE):
+        data = df[df['activity'] == activity][['x-acc', 'y-acc', 'z-acc', 'x-rot', 'y-rot', 'z-rot']][:400]
+    else:
+        data = df[df['activity'] == activity][['x-acc', 'y-acc', 'z-acc']][:400]
+    
     axis = data.plot(subplots=True, figsize=(16, 12), 
                      title=activity)
     for ax in axis:
@@ -56,7 +61,10 @@ plot_activity("Sauter", df)
 plot_activity("Rien", df)
 
 N_TIME_STEPS = N_SAMPLES
-N_FEATURES = 3
+if(WITH_GYROSCOPE):
+    N_FEATURES = 6
+else:
+    N_FEATURES = 3
 step = 20
 segments = []
 labels = []
@@ -64,12 +72,17 @@ for i in range(0, len(df) - N_TIME_STEPS, step):
     xa = df['x-acc'].values[i: i + N_TIME_STEPS]
     ya = df['y-acc'].values[i: i + N_TIME_STEPS]
     za = df['z-acc'].values[i: i + N_TIME_STEPS]
-    #xr = df['x-rot'].values[i: i + N_TIME_STEPS]
-    #yr = df['y-rot'].values[i: i + N_TIME_STEPS]
-    #zr = df['z-rot'].values[i: i + N_TIME_STEPS]
+    if(WITH_GYROSCOPE):
+        xr = df['x-rot'].values[i: i + N_TIME_STEPS]
+        yr = df['y-rot'].values[i: i + N_TIME_STEPS]
+        zr = df['z-rot'].values[i: i + N_TIME_STEPS]
+    
     label = stats.mode(df['activity'][i: i + N_TIME_STEPS])[0][0]
-    #segments.append([xa, ya, za, xr, yr, zr])
-    segments.append([xa, ya, za])
+    if(WITH_GYROSCOPE):
+        segments.append([xa, ya, za, xr, yr, zr])
+    else:
+        segments.append([xa, ya, za])
+
     labels.append(label)
     
 np.array(segments).shape
@@ -137,7 +150,7 @@ l2 = L2_LOSS * \
 
 loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits = pred_Y, labels = Y)) + l2
 
-LEARNING_RATE = 0.0025
+LEARNING_RATE = 0.00125
 
 optimizer = tf.train.AdamOptimizer(learning_rate=LEARNING_RATE).minimize(loss)
 
@@ -145,8 +158,8 @@ correct_pred = tf.equal(tf.argmax(pred_softmax, 1), tf.argmax(Y, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_pred, dtype=tf.float32))
 
 ### TRAINING ###
-N_EPOCHS = 40
-BATCH_SIZE = 150
+N_EPOCHS = 80
+BATCH_SIZE = 200
 
 saver = tf.train.Saver()
 
