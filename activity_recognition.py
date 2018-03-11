@@ -105,7 +105,7 @@ len(X_train)
 len(X_test)
 
 ### BUILDING THE MODEL ###
-N_CLASSES = 3
+N_CLASSES = reshaped_segments.shape[2]
 N_HIDDEN_UNITS = 64
 
 def create_LSTM_model(inputs):
