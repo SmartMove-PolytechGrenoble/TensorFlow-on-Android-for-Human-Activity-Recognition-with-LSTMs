@@ -13,6 +13,31 @@
         tools:context="io.github.introml.activityrecognition.MainActivity">
 
         <TableRow
+            android:id="@+id/training_row"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="22dp"
+            android:textAlignment="center">
+
+            <TextView
+                android:id="@+id/nextMoveTitle"
+                android:layout_width="197dp"
+                android:layout_weight="1"
+                android:text="Training(Move à faire/restant)"
+                android:textAlignment="center"
+                android:textSize="20sp"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/nextMoveTextView"
+                android:layout_weight="1"
+                android:text="@string/probability"
+                android:textAlignment="center"
+                android:textColor="@android:color/holo_red_dark"
+                android:textSize="20sp" />
+        </TableRow>
+
+        <TableRow
             android:id="@+id/title_row"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -142,4 +167,5 @@
         </TableRow>
 
     </TableLayout>
+
 </ScrollView>

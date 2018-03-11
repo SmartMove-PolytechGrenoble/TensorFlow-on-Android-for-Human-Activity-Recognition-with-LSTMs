@@ -21,6 +21,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
+import BusinessClass.Exercice;
+import BusinessClass.Movement;
+import BusinessClass.Training;
+
 public class MainActivity extends AppCompatActivity implements SensorEventListener, TextToSpeech.OnInitListener {
 
     private int currentMoveEnd = 1;
@@ -58,6 +62,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private static long currentMoveTime = 0;
     private static long currentMoveStartTime = 0;
 
+    private Training trainingTest;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,6 +91,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         textToSpeech = new TextToSpeech(this, this);
         textToSpeech.setLanguage(Locale.US);
+
+        trainingTest=new Training();
+
+        trainingTest.addExercice(new Exercice(Movement.JUMPING, 10));
+        trainingTest.addExercice(new Exercice(Movement.NOTHING, 5));
+        trainingTest.addExercice(new Exercice(Movement.WALKING, 10));
+
+
+        trainingTest.lauchTraining();
+
+        TextView nextMoveTextView = (TextView) findViewById(R.id.nextMoveTextView);
+        nextMoveTextView.setText(trainingTest.getText());
+
+
     }
 
     @Override
@@ -208,6 +228,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             za.clear();
             ya.clear();
             xa.clear();
+
+
+            // Training updating
+
+            Movement currentMovement = intToMove(currentMove);
+            trainingTest.doAMovement(currentMovement);
+
+            TextView nextMoveTextView = (TextView) findViewById(R.id.nextMoveTextView);
+
+            if(trainingTest.trainingDone()){
+                nextMoveTextView.setText("Training done");
+            } else {
+                nextMoveTextView.setText(trainingTest.getText());
+            }
         }
     }
 
@@ -242,6 +276,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private SensorManager getSensorManager() {
         return (SensorManager) getSystemService(SENSOR_SERVICE);
+    }
+
+    private Movement intToMove(int i){
+        switch (i){
+            case 0 :
+                return Movement.WALKING;
+            case 1:
+                return Movement.NOTHING;
+            default :
+                return Movement.JUMPING;
+        }
     }
 
 }
