@@ -1,5 +1,6 @@
 package io.github.introml.activityrecognition;
 
+import android.graphics.Typeface;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -7,6 +8,12 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import java.math.BigDecimal;
@@ -33,23 +40,26 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private static List<Float> yr;
     private static List<Float> zr;
 
-    private HashMap<Integer, TextView> moveToCountIdx = new HashMap<Integer, TextView>();
 
     private TextView marcherTextView;
     private TextView rienTextView;
     private TextView sauterTextView;
     private TextView mostLikelyTextView;
-    private TextView sauterCountTextView;
     private TextToSpeech textToSpeech;
     private float[] results;
     private TensorFlowClassifier classifier;
 
-    private String[] labels = {"Marcher", "Rien", "Sauter"};
+    /* The corresponding Label Proba TextView */
+    private HashMap<String,TextView> labelTextViews = new HashMap<String,TextView>();
+    private List<String> labels = Arrays.asList("Marcher","Rien","Sauter");
     /* Move indexes to count */
-    private List moveToCount = new ArrayList<>();
+    private HashMap<Integer, TextView> moveToCountIdx = new HashMap<Integer, TextView>();
+    private List<String> labelsToCount = Arrays.asList("Sauter");
 
-    private int[] motionCounter = new int[labels.length];
+
     /* This array is init with zeros */
+    private int[] motionCounter = new int[labels.size()];
+
     /* This is the threshhold to accept a move */
     private static final double validation = 0.98;
 
@@ -62,6 +72,57 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        TableLayout scrollLayout = (TableLayout) findViewById(R.id.label_list);
+
+        /* Setting each row with probability */
+        for (String label : labels) {
+            TableRow tr = new TableRow(this);
+            tr.setLayoutParams(new TableLayout.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
+            tr.setPadding(0,0,0,130);
+
+            TextView tvLabel = new TextView(this);
+            tvLabel.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT, (float) 1.0));
+            tvLabel.setText(label);
+            tvLabel.setTypeface(null, Typeface.BOLD);
+            tvLabel.setGravity(Gravity.CENTER);
+            tvLabel.setTextSize(18);
+
+            TextView tvProba = new TextView(this);
+            tvProba.setGravity(Gravity.CENTER);
+            tvProba.setTextSize(18);
+            tvProba.setText("0.0");
+
+            tr.addView(tvLabel);
+            tr.addView(tvProba);
+            labelTextViews.put(label, tvProba);
+            scrollLayout.addView(tr);
+        }
+
+        /* Adding move to count rows */
+        for (String label : labelsToCount) {
+            TableRow tr = new TableRow(this);
+            tr.setLayoutParams(new TableLayout.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
+            tr.setPadding(0,0,0,80);
+
+            TextView tvLabel = new TextView(this);
+            tvLabel.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT, (float) 1.0));
+            tvLabel.setText("Compteur : "+label);
+            tvLabel.setTypeface(null, Typeface.BOLD);
+            tvLabel.setGravity(Gravity.CENTER);
+            tvLabel.setTextSize(18);
+
+            TextView tvProba = new TextView(this);
+            tvProba.setGravity(Gravity.CENTER);
+            tvProba.setTextSize(18);
+            tvProba.setText("0");
+
+            tr.addView(tvLabel);
+            tr.addView(tvProba);
+            moveToCountIdx.put(labels.indexOf(label),tvProba);
+
+            scrollLayout.addView(tr);
+        }
+
         xa = new ArrayList<>();
         ya = new ArrayList<>();
         za = new ArrayList<>();
@@ -69,15 +130,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         yr = new ArrayList<>();
         zr = new ArrayList<>();
 
-
-
-        rienTextView = (TextView) findViewById(R.id.rien_prob);
-        sauterTextView = (TextView) findViewById(R.id.sauter_prob);
-        marcherTextView = (TextView) findViewById(R.id.marcher_prob);
-        sauterCountTextView = (TextView) findViewById(R.id.sauter_count);
-
-        moveToCount.add(2);
-        moveToCountIdx.put(2, sauterCountTextView);
 
         classifier = new TensorFlowClassifier(getApplicationContext());
 
@@ -107,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
 //                textToSpeech.speak(String.valueOf(motionCounter[idx]), TextToSpeech.QUEUE_ADD, null, Integer.toString(new Random().nextInt()));
                 if(results[idx] > validation && moveToCountIdx.containsKey(idx) && currentMoveEnd == 1) {
-                    textToSpeech.speak(labels[idx], TextToSpeech.QUEUE_ADD, null, Integer.toString(new Random().nextInt()));
+                    textToSpeech.speak(labels.get(idx), TextToSpeech.QUEUE_ADD, null, Integer.toString(new Random().nextInt()));
                     currentMoveEnd = 0;
                 }
             }
@@ -168,9 +220,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
             results = classifier.predictProbabilities(toFloatArray(data));
 
-            marcherTextView.setText(Float.toString(round(results[0], 2)));
-            sauterTextView.setText(Float.toString(round(results[2], 2)));
-            rienTextView.setText(Float.toString(round(results[1], 2)));
+            int labelIdx = 0;
+
+            for (String label : labels) {
+                TextView tv = labelTextViews.get(label);
+                tv.setText(Float.toString(round(results[labelIdx],2)));
+                labelIdx++;
+            }
 
             int mostLikely = mostLikely(results);
 
@@ -196,7 +252,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     currentMoveEnd = 1;
                 }
 
-                mostLikelyTextView.setText(labels[mostLikely] + " " + currentMoveTime + "ms : " + motionCounter[mostLikely]);
+                mostLikelyTextView.setText(labels.get(mostLikely) + " " + currentMoveTime + "ms : " + motionCounter[mostLikely]);
             }
             else{
                 mostLikelyTextView.setText("Not recognized for " + currentMoveTime + "ms");
