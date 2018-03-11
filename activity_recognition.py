@@ -23,8 +23,6 @@ from sklearn import metrics
 from sklearn.model_selection import train_test_split
 import formatdata as ft
 
-WITH_GYROSCOPE = 1
-
 sns.set(style='whitegrid', palette='muted', font_scale=1.5)
 
 rcParams['figure.figsize'] = 14, 8
@@ -79,7 +77,7 @@ labels = []
 for i in range(0, len(df) - N_TIME_STEPS, step):
     currentRow = []
     for inputType in inputdata:
-        currentRow = df[inputType].values[i: i + N_TIME_STEPS]
+        currentRow.append(df[inputType].values[i: i + N_TIME_STEPS])
     
     label = stats.mode(df['activity'][i: i + N_TIME_STEPS])[0][0]
 
