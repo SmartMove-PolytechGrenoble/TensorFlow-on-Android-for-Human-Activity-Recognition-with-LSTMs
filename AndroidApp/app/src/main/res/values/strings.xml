@@ -8,6 +8,5 @@
     <string name="standing">Standing</string>
     <string name="upstairs">Upstairs</string>
     <string name="walking">Walking</string>
-    <string name="title_activity_home">HomeActivity</string>
     <string name="mostLikely">Current Activity</string>
 </resources>

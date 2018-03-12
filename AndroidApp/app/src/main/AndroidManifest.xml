@@ -2,9 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="io.github.introml.activityrecognition">
 
-    <uses-feature
-        android:name="android.hardware.sensor.accelerometer"
-        android:required="true" />
+    <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -13,22 +11,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".FreeModeActivity" />
-        <activity
-            android:name=".HomeActivity"
-            android:label="@string/title_activity_home"
-            android:theme="@style/AppTheme.NoActionBar">
+        <activity android:name="io.github.introml.activityrecognition.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
-        <activity
-            android:name=".CreateTrainingActivity"
-            android:label="@string/title_activity_create_training"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".TrainingListActivity"></activity>
+
     </application>
 
 </manifest>

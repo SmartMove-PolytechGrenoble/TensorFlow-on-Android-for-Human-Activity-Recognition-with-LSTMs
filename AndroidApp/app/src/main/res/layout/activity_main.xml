@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:background="#ededed"
         android:padding="22dp"
-        tools:context="io.github.introml.activityrecognition.FreeModeActivity">
+        tools:context="io.github.introml.activityrecognition.MainActivity">
 
         <TableRow
             android:id="@+id/mostLikely_row"
