@@ -33,6 +33,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private int currentMoveEnd = 1;
     private static final boolean WITH_GYROSCOPE = false;
     public static final int N_SAMPLES = 200;
+    private int multiplier = 8;
+
     private static List<Float> xa;
     private static List<Float> ya;
     private static List<Float> za;
@@ -59,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private int[] motionCounter = new int[labels.size()];
 
     /* This is the threshhold to accept a move */
-    private static final double validation = 0.85;
+    private static final double validation = 0.99  ;
 
     private static int currentMove = -1;
     private static long currentMoveTime = 0;
@@ -135,6 +137,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         xa = new ArrayList<>();
         ya = new ArrayList<>();
         za = new ArrayList<>();
+
         xr = new ArrayList<>();
         yr = new ArrayList<>();
         zr = new ArrayList<>();
@@ -217,18 +220,28 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     }
 
+    public void deletePart(List l, int n){
+        for(int i = 0; i<n; i++){
+            l.remove(0);
+        }
+    }
+
     private void activityPrediction() {
         if (xa.size() >= N_SAMPLES && ya.size() >= N_SAMPLES && za.size() >= N_SAMPLES) {
             if (WITH_GYROSCOPE && !(xr.size() >= N_SAMPLES && yr.size() >= N_SAMPLES && zr.size() >= N_SAMPLES)){
                 return;
             }
             List<Float> data = new ArrayList<>();
+
             data.addAll(xa);
             data.addAll(ya);
             data.addAll(za);
+
             data.addAll(xr);
             data.addAll(yr);
             data.addAll(zr);
+
+
 
             results = classifier.predictProbabilities(toFloatArray(data));
 
@@ -261,7 +274,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 if(moveToCountIdx.containsKey(mostLikely)){
                     moveToCountIdx.get(mostLikely).setText(Integer.toString(motionCounter[mostLikely]));
                     if(currentMoveEnd == 1) {
-                        textToSpeech.speak(labels.get(mostLikely), TextToSpeech.QUEUE_ADD, null, Integer.toString(new Random().nextInt()));
+                        textToSpeech.speak(labels.get(mostLikely), TextToSpeech.QUEUE_FLUSH, null, Integer.toString(new Random().nextInt()));
                         currentMoveEnd = 0;
                     }
                 }else{
@@ -274,12 +287,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 mostLikelyTextView.setText("Not recognized for " + currentMoveTime + "ms");
             }
 
+            deletePart(za, N_SAMPLES/multiplier);
+            deletePart(ya, N_SAMPLES/multiplier);
+            deletePart(xa, N_SAMPLES/multiplier);
+           /*
             zr.clear();
             yr.clear();
             xr.clear();
             za.clear();
             ya.clear();
             xa.clear();
+            */
         }
     }
 

@@ -163,7 +163,7 @@ accuracy = tf.reduce_mean(tf.cast(correct_pred, dtype=tf.float32))
 
 ### TRAINING ###
 N_EPOCHS = 40
-BATCH_SIZE = 300
+BATCH_SIZE = 512
 
 saver = tf.train.Saver()
 
