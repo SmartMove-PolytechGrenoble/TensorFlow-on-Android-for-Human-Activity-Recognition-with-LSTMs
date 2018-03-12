@@ -94,15 +94,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         trainingTest=new Training();
 
-        //trainingTest.addExercice(new Exercice(Movement.JUMPING, 10));
+        trainingTest.addExercice(new Exercice(Movement.JUMPING, 10));
         trainingTest.addExercice(new Exercice(Movement.NOTHING, 5));
-        //trainingTest.addExercice(new Exercice(Movement.WALKING, 10));
+        trainingTest.addExercice(new Exercice(Movement.WALKING, 10));
 
 
         trainingTest.lauchTraining();
 
         TextView nextMoveTextView = (TextView) findViewById(R.id.nextMoveTextView);
         nextMoveTextView.setText(trainingTest.getText());
+        textToSpeech.speak(trainingTest.getTextToSpeech(), TextToSpeech.QUEUE_ADD, null);
 
 
     }
@@ -236,9 +237,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             trainingTest.doAMovement(currentMovement);
 
             TextView nextMoveTextView = (TextView) findViewById(R.id.nextMoveTextView);
-
-             nextMoveTextView.setText(trainingTest.getText());
-
+            nextMoveTextView.setText(trainingTest.getText());
+            textToSpeech.speak(trainingTest.getTextToSpeech(), TextToSpeech.QUEUE_ADD, null);
         }
     }
 
