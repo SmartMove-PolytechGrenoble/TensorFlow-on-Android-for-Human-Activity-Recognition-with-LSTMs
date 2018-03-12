@@ -1,6 +1,5 @@
 package io.github.introml.activityrecognition;
 
-import android.graphics.Typeface;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -27,6 +26,10 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
+
+import BusinessClass.Exercice;
+import BusinessClass.Movement;
+import BusinessClass.Training;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener, TextToSpeech.OnInitListener {
 
@@ -66,6 +69,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private static int currentMove = -1;
     private static long currentMoveTime = 0;
     private static long currentMoveStartTime = 0;
+
+    private Training trainingTest;
 
     public static Integer getOutputNumber(){
         return labels.size();
@@ -152,6 +157,21 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         textToSpeech = new TextToSpeech(this, this);
         textToSpeech.setLanguage(Locale.US);
+
+        trainingTest=new Training();
+
+        trainingTest.addExercice(new Exercice(Movement.JUMPING, 10));
+        trainingTest.addExercice(new Exercice(Movement.NOTHING, 5));
+        trainingTest.addExercice(new Exercice(Movement.WALKING, 10));
+
+
+        trainingTest.lauchTraining();
+
+        TextView nextMoveTextView = (TextView) findViewById(R.id.nextMoveTextView);
+        nextMoveTextView.setText(trainingTest.getText());
+        textToSpeech.speak(trainingTest.getTextToSpeech(), TextToSpeech.QUEUE_ADD, null);
+
+
     }
 
     @Override
@@ -298,6 +318,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             ya.clear();
             xa.clear();
             */
+
+            // Training updating
+
+            Movement currentMovement = intToMove(currentMove);
+            trainingTest.doAMovement(currentMovement);
+
+            TextView nextMoveTextView = (TextView) findViewById(R.id.nextMoveTextView);
+            nextMoveTextView.setText(trainingTest.getText());
+            textToSpeech.speak(trainingTest.getTextToSpeech(), TextToSpeech.QUEUE_ADD, null);
         }
     }
 
@@ -332,6 +361,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private SensorManager getSensorManager() {
         return (SensorManager) getSystemService(SENSOR_SERVICE);
+    }
+
+    private Movement intToMove(int i){
+        switch (i){
+            case 0 :
+                return Movement.WALKING;
+            case 1:
+                return Movement.NOTHING;
+            default :
+                return Movement.JUMPING;
+        }
     }
 
 }
