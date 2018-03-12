@@ -1,5 +1,6 @@
 package io.github.introml.activityrecognition;
 
+import android.graphics.Typeface;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -158,15 +159,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         textToSpeech = new TextToSpeech(this, this);
         textToSpeech.setLanguage(Locale.US);
 
+
+        // Création et lancement d'un training bidon
         trainingTest=new Training();
 
-        trainingTest.addExercice(new Exercice(Movement.JUMPING, 10));
-        trainingTest.addExercice(new Exercice(Movement.NOTHING, 5));
-        trainingTest.addExercice(new Exercice(Movement.WALKING, 10));
-
+        trainingTest.addExercice(new Exercice(Movement.JUMPING, 25));
+        trainingTest.addExercice(new Exercice(Movement.NOTHING, 20));
+        trainingTest.addExercice(new Exercice(Movement.WALKING, 15));
 
         trainingTest.lauchTraining();
 
+        // Mise à jour de l'affichage et du speaking
         TextView nextMoveTextView = (TextView) findViewById(R.id.nextMoveTextView);
         nextMoveTextView.setText(trainingTest.getText());
         textToSpeech.speak(trainingTest.getTextToSpeech(), TextToSpeech.QUEUE_ADD, null);
@@ -320,10 +323,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             */
 
             // Training updating
-
             Movement currentMovement = intToMove(currentMove);
+            // Avancement d'un "pas"  dans le training
             trainingTest.doAMovement(currentMovement);
 
+            // Mise à jour de l'affichage et de l'aide vocale
             TextView nextMoveTextView = (TextView) findViewById(R.id.nextMoveTextView);
             nextMoveTextView.setText(trainingTest.getText());
             textToSpeech.speak(trainingTest.getTextToSpeech(), TextToSpeech.QUEUE_ADD, null);
