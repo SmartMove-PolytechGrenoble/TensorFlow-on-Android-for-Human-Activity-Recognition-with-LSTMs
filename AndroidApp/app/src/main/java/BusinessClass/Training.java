@@ -3,6 +3,7 @@ package BusinessClass;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -12,6 +13,10 @@ import java.util.List;
 public class Training {
 
     private List<Exercice> exercices;
+
+    private int totalNumberOfRepetition;
+
+    private int numberOfRepetition;
 
     private String trainingName;
 
@@ -47,20 +52,29 @@ public class Training {
         exerciceNumber=0;
         currentExercice=exercices.get(exerciceNumber);
         trainingDone=false;
+
+        numberOfRepetition=0;
+        totalNumberOfRepetition=0;
+
+        for(int i=0; i<exercices.size(); i++){
+            totalNumberOfRepetition+=exercices.get(i).getRepetition();
+        }
     }
 
     public void doAMovement(Movement m){
-        if(!trainingDone && currentExercice.getMovement()==m ){
-            currentExercice.doARepetition();
-            if(currentExercice.getRemainingRepetition()==0){
-                exerciceNumber++;
-                Log.e("Bite", Integer.toString(exerciceNumber));
-                Log.e("Bite", Integer.toString(exercices.size()));
-                if(exerciceNumber==exercices.size()){
-                    trainingDone=true;
-                    Log.e("BITE", "done");
-                }else{
-                    currentExercice=exercices.get(exerciceNumber);
+        if(!trainingDone) {
+            numberOfRepetition++;
+
+            if (currentExercice.getMovement() == m) {
+                currentExercice.doARepetition();
+                if (currentExercice.getRemainingRepetition() == 0) {
+                    exerciceNumber++;
+                    if (exerciceNumber == exercices.size()) {
+                        trainingDone = true;
+
+                    } else {
+                        currentExercice = exercices.get(exerciceNumber);
+                    }
                 }
             }
         }
@@ -72,6 +86,20 @@ public class Training {
 
 
     public String getText(){
-        return currentExercice.getMovement().toString() + " " + Integer.toString(currentExercice.getRemainingRepetition());
+
+        if(trainingDone){
+
+            float accuracy = (float) totalNumberOfRepetition / (float) numberOfRepetition;
+            accuracy*=100;
+
+            Log.e("Debug", "nor" + numberOfRepetition);
+            Log.e("Debug", "tnor" + totalNumberOfRepetition);
+            Log.e("Debug", "a" + accuracy);
+
+            return "Training done " + accuracy + "% of accuracy." ;
+        } else {
+            return currentExercice.getMovement().toString() + " " + Integer.toString(currentExercice.getRemainingRepetition());
+        }
+
     }
 }
