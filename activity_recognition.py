@@ -27,7 +27,7 @@ sns.set(style='whitegrid', palette='muted', font_scale=1.5)
 
 rcParams['figure.figsize'] = 14, 8
 
-N_SAMPLES = 100
+N_SAMPLES = 200
 RANDOM_SEED = 42
 
 #inputdata : data correspondance in each row
@@ -53,7 +53,7 @@ df['activity'].value_counts().plot(kind='bar', title='Training examples by activ
 df['user'].value_counts().plot(kind='bar', title='Training examples by user')
 
 def plot_activity(activity, df):
-    data = df[df['activity'] == activity][inputdata][:400]
+    data = df[df['activity'] == activity][inputdata][:260]
     
     axis = data.plot(subplots=True, figsize=(16, 12), 
                      title=activity)
@@ -62,8 +62,11 @@ def plot_activity(activity, df):
         
         
 plot_activity("Marcher", df)
-plot_activity("Sauter", df)
 plot_activity("Rien", df)
+plot_activity("Sauter", df)
+
+plot_activity("troisSix", df)
+
 
 N_TIME_STEPS = N_SAMPLES
 
@@ -105,7 +108,8 @@ len(X_train)
 len(X_test)
 
 ### BUILDING THE MODEL ###
-N_CLASSES = reshaped_segments.shape[2]
+N_CLASSES = labels.shape[1]
+print(N_CLASSES)
 N_HIDDEN_UNITS = 64
 
 def create_LSTM_model(inputs):
@@ -150,7 +154,7 @@ l2 = L2_LOSS * \
 
 loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits = pred_Y, labels = Y)) + l2
 
-LEARNING_RATE = 0.00125
+LEARNING_RATE = 0.0025
 
 optimizer = tf.train.AdamOptimizer(learning_rate=LEARNING_RATE).minimize(loss)
 
@@ -159,7 +163,7 @@ accuracy = tf.reduce_mean(tf.cast(correct_pred, dtype=tf.float32))
 
 ### TRAINING ###
 N_EPOCHS = 40
-BATCH_SIZE = 1000
+BATCH_SIZE = 300
 
 saver = tf.train.Saver()
 
@@ -228,7 +232,7 @@ plt.ylim(0)
 
 plt.show()
 
-LABELS = ['Marcher', 'Rien', 'Sauter']
+LABELS = ['Marcher', 'Rien', 'Sauter','180','360']
 
 max_test = np.argmax(y_test, axis=1)
 max_predictions = np.argmax(predictions, axis=1)
