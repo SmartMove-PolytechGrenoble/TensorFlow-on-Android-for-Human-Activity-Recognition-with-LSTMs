@@ -32,14 +32,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private int currentMoveEnd = 1;
     private static final boolean WITH_GYROSCOPE = false;
-    private static final int N_SAMPLES = 100;
+    public static final int N_SAMPLES = 200;
     private static List<Float> xa;
     private static List<Float> ya;
     private static List<Float> za;
     private static List<Float> xr;
     private static List<Float> yr;
     private static List<Float> zr;
-
 
     private TextView marcherTextView;
     private TextView rienTextView;
@@ -51,26 +50,33 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     /* The corresponding Label Proba TextView */
     private HashMap<String,TextView> labelTextViews = new HashMap<String,TextView>();
-    private List<String> labels = Arrays.asList("Marcher","Rien","Sauter");
+    private static List<String> labels = Arrays.asList("Marcher","Rien","Sauter","360");
     /* Move indexes to count */
     private HashMap<Integer, TextView> moveToCountIdx = new HashMap<Integer, TextView>();
-    private List<String> labelsToCount = Arrays.asList("Sauter");
-
+    private List<String> labelsToCount = Arrays.asList("Sauter","360");
 
     /* This array is init with zeros */
     private int[] motionCounter = new int[labels.size()];
 
     /* This is the threshhold to accept a move */
-    private static final double validation = 0.98;
-
+    private static final double validation = 0.85;
 
     private static int currentMove = -1;
     private static long currentMoveTime = 0;
     private static long currentMoveStartTime = 0;
 
+    public static Integer getOutputNumber(){
+        return labels.size();
+    }
+
+    public static Integer getSampleNumber(){
+        return N_SAMPLES;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         TableLayout scrollLayout = (TableLayout) findViewById(R.id.label_list);
 
@@ -97,6 +103,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             labelTextViews.put(label, tvProba);
             scrollLayout.addView(tr);
         }
+
+
+
 
         /* Adding move to count rows */
         for (String label : labelsToCount) {
@@ -130,6 +139,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         yr = new ArrayList<>();
         zr = new ArrayList<>();
 
+        for (String label : labels) {
+           // R.id.
+        }
 
         classifier = new TensorFlowClassifier(getApplicationContext());
 
@@ -158,10 +170,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 }
 
 //                textToSpeech.speak(String.valueOf(motionCounter[idx]), TextToSpeech.QUEUE_ADD, null, Integer.toString(new Random().nextInt()));
-                if(results[idx] > validation && moveToCountIdx.containsKey(idx) && currentMoveEnd == 1) {
-                    textToSpeech.speak(labels.get(idx), TextToSpeech.QUEUE_ADD, null, Integer.toString(new Random().nextInt()));
-                    currentMoveEnd = 0;
-                }
+//                if(results[idx] > validation && moveToCountIdx.containsKey(idx) && currentMoveEnd == 1) {
+//                    textToSpeech.speak(labels.get(idx), TextToSpeech.QUEUE_ADD, null, Integer.toString(new Random().nextInt()));
+//                    currentMoveEnd = 0;
+//                }
             }
         }, 2000, 3000);
     }
@@ -248,6 +260,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             if(mostLikely != -1){
                 if(moveToCountIdx.containsKey(mostLikely)){
                     moveToCountIdx.get(mostLikely).setText(Integer.toString(motionCounter[mostLikely]));
+                    if(currentMoveEnd == 1) {
+                        textToSpeech.speak(labels.get(mostLikely), TextToSpeech.QUEUE_ADD, null, Integer.toString(new Random().nextInt()));
+                        currentMoveEnd = 0;
+                    }
                 }else{
                     currentMoveEnd = 1;
                 }
