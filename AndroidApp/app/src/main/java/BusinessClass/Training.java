@@ -24,6 +24,7 @@ public class Training {
 
     private int exerciceNumber;
     private boolean trainingDone;
+    private boolean trainingStarted;
     private String textToSpeech;
 
     public Training() {
@@ -31,6 +32,7 @@ public class Training {
         currentExercice=null;
         exerciceNumber=0;
         trainingDone=false;
+        trainingStarted=false;
     }
 
     public void addExercice(Exercice e){
@@ -53,6 +55,7 @@ public class Training {
         exerciceNumber=0;
         currentExercice=exercices.get(exerciceNumber);
         trainingDone=false;
+        trainingStarted=true;
 
         numberOfRepetition=0;
         totalNumberOfRepetition=0;
@@ -65,7 +68,7 @@ public class Training {
     }
 
     public void doAMovement(Movement m){
-        if(!trainingDone) {
+        if(!trainingDone && trainingStarted) {
             numberOfRepetition++;
 
             if (currentExercice.getMovement() == m) {
@@ -103,7 +106,11 @@ public class Training {
 
             return "Training done, " + accuracy + "% of accuracy." ;
         } else {
-            return currentExercice.getMovement().toString() + " " + Integer.toString(currentExercice.getRemainingRepetition());
+            if(trainingStarted){
+                return currentExercice.getMovement().toString() + " " + Integer.toString(currentExercice.getRemainingRepetition());
+            }else{
+                return "";
+            }
         }
 
     }

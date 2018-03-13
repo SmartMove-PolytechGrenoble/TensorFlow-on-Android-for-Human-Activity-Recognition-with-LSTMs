@@ -9,4 +9,10 @@
     <string name="upstairs">Upstairs</string>
     <string name="walking">Walking</string>
     <string name="mostLikely">Current Activity</string>
+    <string-array name="training_array">
+        <item>Entrainement facile</item>
+        <item>ALM</item>
+        <item>SD</item>
+        <item>Lafay</item>
+    </string-array>
 </resources>

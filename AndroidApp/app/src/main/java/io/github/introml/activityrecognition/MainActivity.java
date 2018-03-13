@@ -12,8 +12,9 @@ import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -21,14 +22,12 @@ import android.widget.TextView;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 
 import BusinessClass.Exercice;
 import BusinessClass.Movement;
@@ -55,6 +54,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private TextToSpeech textToSpeech;
     private float[] results;
     private TensorFlowClassifier classifier;
+
+    private Spinner spinner;
+    private List<Training> trainings = new LinkedList<>();
+    private Button launchTraining;
 
     /* The corresponding Label Proba TextView */
     private HashMap<String,TextView> labelTextViews = new HashMap<String,TextView>();
@@ -94,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         for (String label : labels) {
             TableRow tr = new TableRow(this);
             tr.setLayoutParams(new TableLayout.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
-            tr.setPadding(0,0,0,130);
+            tr.setPadding(0,0,0,50);
 
             TextView tvLabel = new TextView(this);
             tvLabel.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT, (float) 1.0));
@@ -121,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         for (String label : labelsToCount) {
             TableRow tr = new TableRow(this);
             tr.setLayoutParams(new TableLayout.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
-            tr.setPadding(0,0,0,80);
+            tr.setPadding(0,0,0,40);
 
             TextView tvLabel = new TextView(this);
             tvLabel.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT, (float) 1.0));
@@ -162,23 +165,38 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         textToSpeech.setLanguage(Locale.US);
 
 
-        // Création et lancement d'un training bidon
-        trainingTest=new Training();
+        spinner = (Spinner) findViewById(R.id.trainingChoiceSpinner);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.training_array, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinner.setAdapter(adapter);
 
-        trainingTest.addExercice(new Exercice(Movement.JUMPING, 5));
-        trainingTest.addExercice(new Exercice(Movement.THREESIX, 2));
-        trainingTest.addExercice(new Exercice(Movement.WALKING, 3));
-        trainingTest.addExercice(new Exercice(Movement.JUMPING, 5));
+        generateTraining();
 
-        trainingTest.lauchTraining();
+        launchTraining = (Button) findViewById(R.id.launchTrainingButton);
+        launchTraining.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                trainingTest=trainings.get(spinner.getSelectedItemPosition());
 
-        // Mise à jour de l'affichage et du speaking
+                trainingTest.lauchTraining();
+
+                // Mise à jour de l'affichage et du speaking
+                TextView nextMoveTextView = (TextView) findViewById(R.id.nextMoveTextView);
+                nextMoveTextView.setText(trainingTest.getText());
+                textToSpeech.speak(trainingTest.getTextToSpeech(), TextToSpeech.QUEUE_ADD, null);
+            }
+        });
+
+        trainingTest=trainings.get(0);
         TextView nextMoveTextView = (TextView) findViewById(R.id.nextMoveTextView);
-        nextMoveTextView.setText(trainingTest.getText());
-        textToSpeech.speak(trainingTest.getTextToSpeech(), TextToSpeech.QUEUE_ADD, null);
-
-
+        nextMoveTextView.setText("");
     }
+
+
 
     @Override
     public void onInit(int status) {
@@ -389,4 +407,47 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
+    private void generateTraining() {
+
+        String[] trainingNames = getResources().getStringArray(R.array.training_array);
+
+        Training training=new Training();
+
+        training.addExercice(new Exercice(Movement.JUMPING, 5));
+        training.addExercice(new Exercice(Movement.THREESIX, 2));
+        training.addExercice(new Exercice(Movement.WALKING, 3));
+        training.addExercice(new Exercice(Movement.JUMPING, 5));
+
+        trainings.add(training);
+        training=new Training();
+
+        training.addExercice(new Exercice(Movement.WALKING, 3));
+        training.addExercice(new Exercice(Movement.JUMPING, 5));
+        training.addExercice(new Exercice(Movement.THREESIX, 1));
+
+        trainings.add(training);
+        training=new Training();
+
+        training.addExercice(new Exercice(Movement.JUMPING, 5));
+        training.addExercice(new Exercice(Movement.NOTHING, 1));
+        training.addExercice(new Exercice(Movement.JUMPING, 5));
+        training.addExercice(new Exercice(Movement.NOTHING, 1));
+        training.addExercice(new Exercice(Movement.JUMPING, 5));
+        training.addExercice(new Exercice(Movement.NOTHING, 1));
+
+        trainings.add(training);
+        training=new Training();
+
+        training.addExercice(new Exercice(Movement.THREESIX, 1));
+        training.addExercice(new Exercice(Movement.JUMPING, 5));
+        training.addExercice(new Exercice(Movement.THREESIX, 1));
+        training.addExercice(new Exercice(Movement.JUMPING, 5));
+        training.addExercice(new Exercice(Movement.THREESIX, 1));
+
+        trainings.add(training);
+    }
+
 }
+
+
+

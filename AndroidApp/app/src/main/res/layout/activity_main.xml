@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#ededed"
-        android:padding="22dp"
+        android:padding="10dp"
         tools:context="io.github.introml.activityrecognition.MainActivity">
 
 
@@ -19,34 +19,34 @@
             android:id="@+id/training_management_row"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="22dp"
+            android:padding="10dp"
             android:textAlignment="center">
 
 
             <Spinner
                 android:id="@+id/trainingChoiceSpinner"
-                android:layout_width="match_parent"
+                android:layout_width="228dp"
                 android:layout_height="wrap_content" />
 
             <Button
                 android:id="@+id/launchTrainingButton"
-                android:layout_width="wrap_content"
+                android:layout_width="80dp"
                 android:layout_height="wrap_content"
-                android:text="Button" />
+                android:text="Start !" />
         </TableRow>
 
         <TableRow
             android:id="@+id/training_row"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="22dp"
+            android:padding="10dp"
             android:textAlignment="center">
 
             <TextView
                 android:id="@+id/nextMoveTitle"
                 android:layout_width="197dp"
                 android:layout_weight="1"
-                android:text="Training(Move à faire/restant)"
+                android:text="Move à faire/restant"
                 android:textAlignment="center"
                 android:textSize="20sp"
                 android:textStyle="bold|italic" />
