@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private int currentMoveEnd = 1;
     private static final boolean WITH_GYROSCOPE = false;
     public static final int N_SAMPLES = 200;
-    private int multiplier = 8;
+    private int multiplier = 4;
 
     private static List<Float> xa;
     private static List<Float> ya;
@@ -52,16 +52,22 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     /* The corresponding Label Proba TextView */
     private HashMap<String,TextView> labelTextViews = new HashMap<String,TextView>();
-    private static List<String> labels = Arrays.asList("Marcher","Rien","Sauter","360");
+    private static List<String> labels = Arrays.asList("Jogging","Marcher","Rien","Sauter", "Squat", "360");
     /* Move indexes to count */
     private HashMap<Integer, TextView> moveToCountIdx = new HashMap<Integer, TextView>();
-    private List<String> labelsToCount = Arrays.asList("Sauter","360");
+    private List<String> labelsToCount = Arrays.asList("Sauter", "Squat", "360");
+
+    /* Corresponding validation rate x in a row */
+    private final Integer moveToCountValidation[] = {3, 3, 3, 3, 3, 3};
+
+    private Integer currentMoveValidation[] = {3, 3, 3, 3, 3, 3};
+
 
     /* This array is init with zeros */
     private int[] motionCounter = new int[labels.size()];
 
     /* This is the threshhold to accept a move */
-    private static final double validation = 0.99  ;
+    private static final double validation = 0.98  ;
 
     private static int currentMove = -1;
     private static long currentMoveTime = 0;
@@ -261,9 +267,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
 
             if (mostLikely != currentMove) {
-                if(0 <= mostLikely){
-                    motionCounter[mostLikely]++;
-                }
                 currentMove = mostLikely;
                 currentMoveStartTime = System.nanoTime();
             }
@@ -272,16 +275,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
             if(mostLikely != -1){
                 if(moveToCountIdx.containsKey(mostLikely)){
-                    moveToCountIdx.get(mostLikely).setText(Integer.toString(motionCounter[mostLikely]));
-                    if(currentMoveEnd == 1) {
+                    if(currentMoveEnd == 1 && currentMoveValidation[mostLikely] == 0) {
+                        motionCounter[mostLikely]++;
+                        moveToCountIdx.get(mostLikely).setText(Integer.toString(motionCounter[mostLikely]));
                         textToSpeech.speak(labels.get(mostLikely), TextToSpeech.QUEUE_FLUSH, null, Integer.toString(new Random().nextInt()));
                         currentMoveEnd = 0;
+                        currentMoveValidation[mostLikely] = moveToCountValidation[mostLikely];
+                    }else{
+                        currentMoveValidation[mostLikely]--;
                     }
                 }else{
                     currentMoveEnd = 1;
                 }
 
-                mostLikelyTextView.setText(labels.get(mostLikely) + " " + currentMoveTime + "ms : " + motionCounter[mostLikely]);
+                mostLikelyTextView.setText(labels.get(mostLikely) + " " + currentMoveTime + "ms");
             }
             else{
                 mostLikelyTextView.setText("Not recognized for " + currentMoveTime + "ms");
