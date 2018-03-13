@@ -8,7 +8,8 @@ public enum Movement {
 
     NOTHING ("Nothing"),
     WALKING ("Walking"),
-    JUMPING ("Jumping");
+    JUMPING ("Jumping"),
+    THREESIX ("360");
 
     private String name;
 

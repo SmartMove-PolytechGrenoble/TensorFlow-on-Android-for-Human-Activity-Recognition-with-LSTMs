@@ -5,6 +5,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
@@ -37,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private int currentMoveEnd = 1;
     private static final boolean WITH_GYROSCOPE = false;
     public static final int N_SAMPLES = 200;
-    private int multiplier = 8;
+    private int multiplier = 4;
 
     private static List<Float> xa;
     private static List<Float> ya;
@@ -65,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private int[] motionCounter = new int[labels.size()];
 
     /* This is the threshhold to accept a move */
-    private static final double validation = 0.99  ;
+    private static final double validation = 0.95  ;
 
     private static int currentMove = -1;
     private static long currentMoveTime = 0;
@@ -163,9 +165,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // Création et lancement d'un training bidon
         trainingTest=new Training();
 
-        trainingTest.addExercice(new Exercice(Movement.JUMPING, 25));
-        trainingTest.addExercice(new Exercice(Movement.NOTHING, 20));
-        trainingTest.addExercice(new Exercice(Movement.WALKING, 15));
+        trainingTest.addExercice(new Exercice(Movement.JUMPING, 5));
+        trainingTest.addExercice(new Exercice(Movement.THREESIX, 2));
+        trainingTest.addExercice(new Exercice(Movement.WALKING, 3));
+        trainingTest.addExercice(new Exercice(Movement.JUMPING, 5));
 
         trainingTest.lauchTraining();
 
@@ -286,9 +289,21 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             if (mostLikely != currentMove) {
                 if(0 <= mostLikely){
                     motionCounter[mostLikely]++;
+
+                    // Training updating
+                    Movement currentMovement = intToMove(mostLikely);
+                    // Avancement d'un "pas"  dans le training
+                    trainingTest.doAMovement(currentMovement);
+
+                    // Mise à jour de l'affichage et de l'aide vocale
+                    TextView nextMoveTextView = (TextView) findViewById(R.id.nextMoveTextView);
+                    nextMoveTextView.setText(trainingTest.getText());
+                    textToSpeech.speak(trainingTest.getTextToSpeech(), TextToSpeech.QUEUE_ADD, null);
                 }
                 currentMove = mostLikely;
                 currentMoveStartTime = System.nanoTime();
+
+
             }
 
             currentMoveTime = (currentMoveStartTime - System.nanoTime()) / 1000000;
@@ -297,7 +312,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 if(moveToCountIdx.containsKey(mostLikely)){
                     moveToCountIdx.get(mostLikely).setText(Integer.toString(motionCounter[mostLikely]));
                     if(currentMoveEnd == 1) {
-                        textToSpeech.speak(labels.get(mostLikely), TextToSpeech.QUEUE_FLUSH, null, Integer.toString(new Random().nextInt()));
+                        //textToSpeech.speak(labels.get(mostLikely), TextToSpeech.QUEUE_ADD, null, Integer.toString(new Random().nextInt()));
+                        ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+                        toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,150);
                         currentMoveEnd = 0;
                     }
                 }else{
@@ -322,15 +339,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             xa.clear();
             */
 
-            // Training updating
-            Movement currentMovement = intToMove(currentMove);
-            // Avancement d'un "pas"  dans le training
-            trainingTest.doAMovement(currentMovement);
 
-            // Mise à jour de l'affichage et de l'aide vocale
-            TextView nextMoveTextView = (TextView) findViewById(R.id.nextMoveTextView);
-            nextMoveTextView.setText(trainingTest.getText());
-            textToSpeech.speak(trainingTest.getTextToSpeech(), TextToSpeech.QUEUE_ADD, null);
         }
     }
 
@@ -371,10 +380,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         switch (i){
             case 0 :
                 return Movement.WALKING;
-            case 1:
-                return Movement.NOTHING;
-            default :
+            case 3:
+                return Movement.THREESIX;
+            case 2:
                 return Movement.JUMPING;
+            default :
+                return Movement.NOTHING;
         }
     }
 
