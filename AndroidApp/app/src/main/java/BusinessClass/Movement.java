@@ -17,19 +17,11 @@ public enum Movement {
         name = s;
     }
 
-    static  public Movement stringToMovement(String s){
-        Movement[] movs = Movement.class.getEnumConstants();
-        for (Movement m: movs) {
-            if(m.name.equals(s)){
-                return m;
-            }
-        }
-
-        // TODO add error
-        return NOTHING;
+    public String toString(){
+        return name;
     }
 
-    public String toString(){
+    public String getName(){
         return name;
     }
 }
