@@ -14,6 +14,27 @@
         android:padding="22dp"
         tools:context="io.github.introml.activityrecognition.MainActivity">
 
+
+        <TableRow
+            android:id="@+id/training_management_row"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="22dp"
+            android:textAlignment="center">
+
+
+            <Spinner
+                android:id="@+id/trainingChoiceSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/launchTrainingButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Button" />
+        </TableRow>
+
         <TableRow
             android:id="@+id/training_row"
             android:layout_width="match_parent"
