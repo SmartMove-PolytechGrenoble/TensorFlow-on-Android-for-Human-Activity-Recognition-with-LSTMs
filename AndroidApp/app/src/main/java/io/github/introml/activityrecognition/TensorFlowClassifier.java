@@ -16,7 +16,7 @@ public class TensorFlowClassifier {
     private static final String INPUT_NODE = "input";
     private static final String[] OUTPUT_NODES = {"y_"};
     private static final String OUTPUT_NODE = "y_";
-    private static final long[] INPUT_SIZE = {1, MainActivity.N_SAMPLES, 3};
+    private static final long[] INPUT_SIZE = {1, MainActivity.N_SAMPLES, 6};
     private static final int OUTPUT_SIZE = MainActivity.getOutputNumber();
 
     public TensorFlowClassifier(final Context context) {

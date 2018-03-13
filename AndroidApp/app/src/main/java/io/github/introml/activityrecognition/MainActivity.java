@@ -31,9 +31,9 @@ import java.util.concurrent.TimeUnit;
 public class MainActivity extends AppCompatActivity implements SensorEventListener, TextToSpeech.OnInitListener {
 
     private int currentMoveEnd = 1;
-    private static final boolean WITH_GYROSCOPE = false;
-    public static final int N_SAMPLES = 200;
-    private int multiplier = 8;
+    private static final boolean WITH_GYROSCOPE = true;
+    public static final int N_SAMPLES = 240;
+    private int multiplier = 4;
 
     private static List<Float> xa;
     private static List<Float> ya;
@@ -290,6 +290,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             deletePart(za, N_SAMPLES/multiplier);
             deletePart(ya, N_SAMPLES/multiplier);
             deletePart(xa, N_SAMPLES/multiplier);
+            deletePart(zr, N_SAMPLES/multiplier);
+            deletePart(yr, N_SAMPLES/multiplier);
+            deletePart(xr, N_SAMPLES/multiplier);
            /*
             zr.clear();
             yr.clear();

@@ -9,7 +9,7 @@ Created on Tue Feb 27 17:59:59 2018
 
 import os
 
-os.chdir("/home/mesh/S10/Orga_Git/TensorFlow-on-Android-for-Human-Activity-Recognition-with-LSTMs/")
+os.chdir("/home/mesh/S10/Nouveau dossier/TensorFlow-on-Android-for-Human-Activity-Recognition-with-LSTMs/")
 
 import pandas as pd
 import numpy as np
@@ -27,14 +27,14 @@ sns.set(style='whitegrid', palette='muted', font_scale=1.5)
 
 rcParams['figure.figsize'] = 14, 8
 
-N_SAMPLES = 200
+N_SAMPLES = 240
 RANDOM_SEED = 42
 
 #inputdata : data correspondance in each row
 inputdata = ['x-acc', 'y-acc', 'z-acc', 'x-rot', 'y-rot', 'z-rot']
 
 #data you don't want to use : it can be empty
-datatodrop = ['x-rot', 'y-rot', 'z-rot']
+datatodrop = []
 
 #à modifier selon la forme du CSV
 #columns = ['user','activity','timestamp', 'x-axis', 'y-axis', 'z-axis']
@@ -64,8 +64,6 @@ def plot_activity(activity, df):
 plot_activity("Marcher", df)
 plot_activity("Rien", df)
 plot_activity("Sauter", df)
-
-plot_activity("troisSix", df)
 
 
 N_TIME_STEPS = N_SAMPLES
