@@ -24,6 +24,10 @@
             android:name="io.github.introml.activityrecognition.MainActivity">
         </activity>
 
+        <activity
+            android:name="io.github.introml.activityrecognition.CreateTrainingActivity">
+        </activity>
+
     </application>
 
 </manifest>

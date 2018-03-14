@@ -17,6 +17,7 @@ import android.widget.Toolbar;
 public class HomeActivity extends Activity {
 
     private Button goToTrainingMode ;
+    private Button goToCreatingMode ;
     private Button goAir ;
 
     @Override
@@ -30,6 +31,15 @@ public class HomeActivity extends Activity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(HomeActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        goToCreatingMode = (Button) findViewById(R.id.goToCreatingMode);
+        goToCreatingMode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(HomeActivity.this, CreateTrainingActivity.class);
                 startActivity(intent);
             }
         });
