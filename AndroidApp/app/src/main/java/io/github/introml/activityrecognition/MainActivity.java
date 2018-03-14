@@ -32,8 +32,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private int currentMoveEnd = 1;
     private static final boolean WITH_GYROSCOPE = false;
-    public static final int N_SAMPLES = 200;
-    private int multiplier = 4;
+    public static final int N_SAMPLES = 175;
+    private int multiplier = 2;
 
     private static List<Float> xa;
     private static List<Float> ya;
@@ -58,16 +58,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private List<String> labelsToCount = Arrays.asList("Sauter", "Squat", "360");
 
     /* Corresponding validation rate x in a row */
-    private final Integer moveToCountValidation[] = {3, 3, 3, 3, 3, 3};
+    private final Integer moveToCountValidation[] = {2, 2, 2, 2, 2, 2};
 
-    private Integer currentMoveValidation[] = {3, 3, 3, 3, 3, 3};
-
+    private Integer currentMoveValidation[] = {2, 2, 2, 0, 2, 1};
 
     /* This array is init with zeros */
     private int[] motionCounter = new int[labels.size()];
 
     /* This is the threshhold to accept a move */
-    private static final double validation = 0.98  ;
+    private static final double validation = 0.95  ;
 
     private static int currentMove = -1;
     private static long currentMoveTime = 0;
@@ -232,6 +231,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
+    private void resetAllValidation(){
+        int j = 0;
+        for(Integer i : currentMoveValidation){
+            currentMoveValidation[j] = moveToCountValidation[j];
+            j++;
+        }
+    }
+
     private void activityPrediction() {
         if (xa.size() >= N_SAMPLES && ya.size() >= N_SAMPLES && za.size() >= N_SAMPLES) {
             if (WITH_GYROSCOPE && !(xr.size() >= N_SAMPLES && yr.size() >= N_SAMPLES && zr.size() >= N_SAMPLES)){
@@ -247,8 +254,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             data.addAll(yr);
             data.addAll(zr);
 
-
-
             results = classifier.predictProbabilities(toFloatArray(data));
 
             int labelIdx = 0;
@@ -261,12 +266,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
             int mostLikely = mostLikely(results);
 
-            if(results[mostLikely] < validation){
+            if(results[mostLikely] <= validation){
                 mostLikely = -1;
                 mostLikelyTextView.setText("Not recognized");
             }
 
+            /* A new move is starting */
             if (mostLikely != currentMove) {
+                resetAllValidation();
                 currentMove = mostLikely;
                 currentMoveStartTime = System.nanoTime();
             }
@@ -274,13 +281,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             currentMoveTime = (currentMoveStartTime - System.nanoTime()) / 1000000;
 
             if(mostLikely != -1){
+                /* Does this move needs to be counted ? */
                 if(moveToCountIdx.containsKey(mostLikely)){
                     if(currentMoveEnd == 1 && currentMoveValidation[mostLikely] == 0) {
                         motionCounter[mostLikely]++;
                         moveToCountIdx.get(mostLikely).setText(Integer.toString(motionCounter[mostLikely]));
                         textToSpeech.speak(labels.get(mostLikely), TextToSpeech.QUEUE_FLUSH, null, Integer.toString(new Random().nextInt()));
                         currentMoveEnd = 0;
-                        currentMoveValidation[mostLikely] = moveToCountValidation[mostLikely];
                     }else{
                         currentMoveValidation[mostLikely]--;
                     }
