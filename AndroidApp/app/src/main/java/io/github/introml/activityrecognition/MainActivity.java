@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private int currentMoveEnd = 1;
     private static final boolean WITH_GYROSCOPE = false;
-    public static final int N_SAMPLES = 200;
+    public static final int N_SAMPLES = 165;
     private int multiplier = 3;
 
     private static List<Float> xa;
