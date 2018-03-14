@@ -9,7 +9,7 @@ Created on Tue Feb 27 17:59:59 2018
 
 import os
 
-os.chdir("/home/mesh/S10/Nouveau dossier/TensorFlow-on-Android-for-Human-Activity-Recognition-with-LSTMs/")
+os.chdir("E:\Programmation\smartmove\TensorFlow-on-Android-for-Human-Activity-Recognition-with-LSTMs")
 
 import pandas as pd
 import numpy as np
@@ -74,6 +74,7 @@ print(N_FEATURES)
 step = 10
 segments = []
 labels = []
+labelsname = []
 for i in range(0, len(df) - N_TIME_STEPS, step):
     currentRow = []
     for inputType in inputdata:
@@ -81,10 +82,13 @@ for i in range(0, len(df) - N_TIME_STEPS, step):
     
     label = stats.mode(df['activity'][i: i + N_TIME_STEPS])[0][0]
 
+
     segments.append(currentRow)
 
     labels.append(label)
-    
+    if label not in labelsname:
+        labelsname.append(label)
+        
 np.array(segments).shape
 
 reshaped_segments = np.asarray(segments, dtype= np.float32).reshape(-1, N_TIME_STEPS, N_FEATURES)
@@ -160,7 +164,7 @@ accuracy = tf.reduce_mean(tf.cast(correct_pred, dtype=tf.float32))
 
 ### TRAINING ###
 N_EPOCHS = 40
-BATCH_SIZE = 150
+BATCH_SIZE = 300
 
 saver = tf.train.Saver()
 
@@ -173,29 +177,29 @@ sess=tf.InteractiveSession()
 sess.run(tf.global_variables_initializer())
 
 train_count = len(X_train)
-
-for i in range(1, N_EPOCHS + 1):
-    for start, end in zip(range(0, train_count, BATCH_SIZE),
-                          range(BATCH_SIZE, train_count + 1,BATCH_SIZE)):
-        sess.run(optimizer, feed_dict={X: X_train[start:end],
-                                       Y: y_train[start:end]})
-
-    _, acc_train, loss_train = sess.run([pred_softmax, accuracy, loss], feed_dict={
-                                            X: X_train, Y: y_train})
-
-    _, acc_test, loss_test = sess.run([pred_softmax, accuracy, loss], feed_dict={
-                                            X: X_test, Y: y_test})
-
-    history['train_loss'].append(loss_train)
-    history['train_acc'].append(acc_train)
-    history['test_loss'].append(loss_test)
-    history['test_acc'].append(acc_test)
-
-    if i != 1 and i % 10 != 0:
-        continue
-
-    print(acc_test)
-    print('epoch: {i} test accuracy: {acc_test} loss: {loss_test}')
+with tf.device('/device:GPU:0'):
+    for i in range(1, N_EPOCHS + 1):
+        for start, end in zip(range(0, train_count, BATCH_SIZE),
+                              range(BATCH_SIZE, train_count + 1,BATCH_SIZE)):
+            sess.run(optimizer, feed_dict={X: X_train[start:end],
+                                           Y: y_train[start:end]})
+    
+        _, acc_train, loss_train = sess.run([pred_softmax, accuracy, loss], feed_dict={
+                                                X: X_train, Y: y_train})
+    
+        _, acc_test, loss_test = sess.run([pred_softmax, accuracy, loss], feed_dict={
+                                                X: X_test, Y: y_test})
+    
+        history['train_loss'].append(loss_train)
+        history['train_acc'].append(acc_train)
+        history['test_loss'].append(loss_test)
+        history['test_acc'].append(acc_test)
+    
+        if i != 1 and i % 10 != 0:
+            continue
+    
+        print(acc_test)
+        print('epoch: {i} test accuracy: {acc_test} loss: {loss_test}')
     
 predictions, acc_final, loss_final = sess.run([pred_softmax, accuracy, loss], feed_dict={X: X_test, Y: y_test})
 
@@ -229,7 +233,7 @@ plt.ylim(0)
 
 plt.show()
 
-LABELS = ['Marcher', 'Rien', 'Sauter']
+LABELS = labelsname
 
 max_test = np.argmax(y_test, axis=1)
 max_predictions = np.argmax(predictions, axis=1)
