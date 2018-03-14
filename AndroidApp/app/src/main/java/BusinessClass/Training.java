@@ -29,6 +29,10 @@ public class Training {
     private boolean trainingStarted;
     private String textToSpeech;
 
+    public Exercice getCurrentExercice(){
+        return currentExercice;
+    }
+
     public Training() {
         this.exercices = new ArrayList<>();
         currentExercice=null;

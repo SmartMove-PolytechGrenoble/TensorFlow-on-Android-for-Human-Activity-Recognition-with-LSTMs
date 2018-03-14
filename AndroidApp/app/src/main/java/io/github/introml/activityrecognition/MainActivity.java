@@ -79,13 +79,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private int[] motionCounter = new int[labels.size()];
 
     /* This is the threshhold to accept a move */
-    private static final double validation = 0.98  ;
+    private static final double validation = 0.98 ;
 
     private static int currentMove = -1;
     private static long currentMoveTime = 0;
     private static long currentMoveStartTime = 0;
 
     private Training trainingTest;
+
+    /* Sound */
+    private ToneGenerator toneGen1;
 
     public static Integer getOutputNumber(){
         return labels.size();
@@ -125,9 +128,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             labelTextViews.put(label, tvProba);
             scrollLayout.addView(tr);
         }
-
-
-
 
         /* Adding move to count rows */
         for (String label : labelsToCount) {
@@ -202,6 +202,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         trainingTest= (Training) spinner.getSelectedItem();
         TextView nextMoveTextView = (TextView) findViewById(R.id.nextMoveTextView);
         nextMoveTextView.setText("");
+
+        toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
     }
 
 
@@ -338,15 +340,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                         // Training updating
                         // Avancement d'un "pas"  dans le training
                         trainingTest.doAMovement(currentMovement);
-    
-                        // Mise à jour de l'affichage et de l'aide vocale
-                        TextView nextMoveTextView = (TextView) findViewById(R.id.nextMoveTextView);
-                        nextMoveTextView.setText(trainingTest.getText());
-                        textToSpeech.speak(trainingTest.getTextToSpeech(), TextToSpeech.QUEUE_ADD, null);
-                        
+
+                        if(trainingTest.getCurrentExercice() != null) {
+                            if (trainingTest.getCurrentExercice().getMovement() == intToMove(mostLikely)) {
+                                // Mise à jour de l'affichage et de l'aide vocale
+                                TextView nextMoveTextView = (TextView) findViewById(R.id.nextMoveTextView);
+                                nextMoveTextView.setText(trainingTest.getText());
+                                textToSpeech.speak(trainingTest.getTextToSpeech(), TextToSpeech.QUEUE_ADD, null);
+                                toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,150);
+                            }
+                        }
                         moveToCountIdx.get(mostLikely).setText(Integer.toString(motionCounter[mostLikely]));
-                        ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
-                        toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,150);
+
+
                         //textToSpeech.speak(labels.get(mostLikely), TextToSpeech.QUEUE_ADD, null, Integer.toString(new Random().nextInt()));
                         
                         currentMoveEnd = 0;
@@ -356,12 +362,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 }else{
 
                     motionCounter[mostLikely]++;
-                    trainingTest.doAMovement(currentMovement);
                     currentMoveEnd = 1;
-
-                    TextView nextMoveTextView = (TextView) findViewById(R.id.nextMoveTextView);
-                    nextMoveTextView.setText(trainingTest.getText());
-
+                    if(trainingTest.getCurrentExercice() != null) {
+                        if (trainingTest.getCurrentExercice().getMovement() == intToMove(mostLikely)) {
+                            trainingTest.doAMovement(currentMovement);
+                            TextView nextMoveTextView = (TextView) findViewById(R.id.nextMoveTextView);
+                            nextMoveTextView.setText(trainingTest.getText());
+                            textToSpeech.speak(trainingTest.getTextToSpeech(), TextToSpeech.QUEUE_ADD, null);
+                            toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP, 150);
+                        }
+                    }
                     //ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
                     //toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,150);
                 }
