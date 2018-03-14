@@ -65,21 +65,21 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     /* The corresponding Label Proba TextView */
     private HashMap<String,TextView> labelTextViews = new HashMap<String,TextView>();
-    private static List<String> labels = Arrays.asList("Jogging","Marcher","Rien","Sauter", "Squat", "360");
+    private static List<String> labels = Arrays.asList("Jogging","Marcher","PasC","Rien","Sauter", "Squat", "360");
     /* Move indexes to count */
     private HashMap<Integer, TextView> moveToCountIdx = new HashMap<Integer, TextView>();
     private List<String> labelsToCount = Arrays.asList("Sauter", "Squat", "360");
 
     /* Corresponding validation rate x in a row */
-    private final Integer moveToCountValidation[] = {2, 2, 2, 1, 3, 2};
+    private final Integer moveToCountValidation[] = {2, 2, 2, 1, 1, 1, 1};
 
-    private Integer currentMoveValidation[] = {2, 2, 2, 1, 3, 2};
+    private Integer currentMoveValidation[] = {2, 2, 2, 1, 1, 1, 1};
 
     /* This array is init with zeros */
     private int[] motionCounter = new int[labels.size()];
 
     /* This is the threshhold to accept a move */
-    private static final double validation = 0.95  ;
+    private static final double validation = 0.98  ;
 
     private static int currentMove = -1;
     private static long currentMoveTime = 0;
@@ -321,6 +321,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             /* A new move is starting */
             if (mostLikely != currentMove) {
                 resetAllValidation();
+                currentMoveEnd = 1;
                 currentMove = mostLikely;
                 currentMoveStartTime = System.nanoTime();
             }
@@ -361,8 +362,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     TextView nextMoveTextView = (TextView) findViewById(R.id.nextMoveTextView);
                     nextMoveTextView.setText(trainingTest.getText());
 
-                    ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
-                    toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,150);
+                    //ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+                    //toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,150);
                 }
 
                 mostLikelyTextView.setText(labels.get(mostLikely) + " " + motionCounter[mostLikely] + "ms");
@@ -419,18 +420,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private SensorManager getSensorManager() {
         return (SensorManager) getSystemService(SENSOR_SERVICE);
     }
-//("Jogging","Marcher","Rien","Sauter", "Squat", "360");
+//"Jogging","Marcher","PasC","Rien","Sauter", "Squat", "360"
     private Movement intToMove(int i){
         switch (i){
             case 0 :
                 return Movement.JOGGING;
             case 1 :
                 return Movement.WALKING;
-            case 3:
-                return Movement.JUMPING;
+            case 2 :
+                return Movement.PASC;
             case 4:
-                return Movement.SQUAT;
+                return Movement.JUMPING;
             case 5:
+                return Movement.SQUAT;
+            case 6:
                 return Movement.THREESIX;
             default :
                 return Movement.NOTHING;

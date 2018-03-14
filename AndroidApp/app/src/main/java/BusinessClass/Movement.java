@@ -13,6 +13,7 @@ public enum Movement {
     NOTHING ("Nothing"),
     WALKING ("Walking"),
     JUMPING ("Jumping"),
+    PASC ("PASC"),
     THREESIX ("360");
 
     private String name;
@@ -37,6 +38,7 @@ public enum Movement {
         l.add(WALKING);
         l.add(JUMPING);
         l.add(THREESIX);
+        l.add(PASC);
 
         return  l;
     }
