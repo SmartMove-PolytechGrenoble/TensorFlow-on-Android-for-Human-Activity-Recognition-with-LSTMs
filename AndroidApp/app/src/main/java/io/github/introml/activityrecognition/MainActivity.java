@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private int currentMoveEnd = 1;
     private static final boolean WITH_GYROSCOPE = false;
     public static final int N_SAMPLES = 200;
-    private int multiplier = 4;
+    private int multiplier = 3;
 
     private static List<Float> xa;
     private static List<Float> ya;
@@ -65,10 +65,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     /* The corresponding Label Proba TextView */
     private HashMap<String,TextView> labelTextViews = new HashMap<String,TextView>();
-    private static List<String> labels = Arrays.asList("Marcher","Rien","Sauter","360");
+    private static List<String> labels = Arrays.asList("Jogging","Marcher","Rien","Sauter", "Squat", "360");
     /* Move indexes to count */
     private HashMap<Integer, TextView> moveToCountIdx = new HashMap<Integer, TextView>();
-    private List<String> labelsToCount = Arrays.asList("Sauter","360");
+    private List<String> labelsToCount = Arrays.asList("Sauter", "Squat", "360");
+
+    /* Corresponding validation rate x in a row */
+    private final Integer moveToCountValidation[] = {2, 2, 2, 1, 3, 2};
+
+    private Integer currentMoveValidation[] = {2, 2, 2, 1, 3, 2};
 
     /* This array is init with zeros */
     private int[] motionCounter = new int[labels.size()];
@@ -273,6 +278,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
+    private void resetAllValidation(){
+        int j = 0;
+        for(Integer i : currentMoveValidation){
+            currentMoveValidation[j] = moveToCountValidation[j];
+            j++;
+        }
+    }
+
     private void activityPrediction() {
         if (xa.size() >= N_SAMPLES && ya.size() >= N_SAMPLES && za.size() >= N_SAMPLES) {
             if (WITH_GYROSCOPE && !(xr.size() >= N_SAMPLES && yr.size() >= N_SAMPLES && zr.size() >= N_SAMPLES)){
@@ -288,8 +301,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             data.addAll(yr);
             data.addAll(zr);
 
-
-
             results = classifier.predictProbabilities(toFloatArray(data));
 
             int labelIdx = 0;
@@ -302,47 +313,50 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
             int mostLikely = mostLikely(results);
 
-            if(results[mostLikely] < validation){
+            if(results[mostLikely] <= validation){
                 mostLikely = -1;
                 mostLikelyTextView.setText("Not recognized");
             }
 
+            /* A new move is starting */
             if (mostLikely != currentMove) {
-                if(0 <= mostLikely){
-                    motionCounter[mostLikely]++;
-
-                    // Training updating
-                    Movement currentMovement = intToMove(mostLikely);
-                    // Avancement d'un "pas"  dans le training
-                    trainingTest.doAMovement(currentMovement);
-
-                    // Mise à jour de l'affichage et de l'aide vocale
-                    TextView nextMoveTextView = (TextView) findViewById(R.id.nextMoveTextView);
-                    nextMoveTextView.setText(trainingTest.getText());
-                    textToSpeech.speak(trainingTest.getTextToSpeech(), TextToSpeech.QUEUE_ADD, null);
-                }
+                resetAllValidation();
                 currentMove = mostLikely;
                 currentMoveStartTime = System.nanoTime();
-
-
             }
 
             currentMoveTime = (currentMoveStartTime - System.nanoTime()) / 1000000;
 
             if(mostLikely != -1){
+                /* Does this move needs to be counted ? */
                 if(moveToCountIdx.containsKey(mostLikely)){
-                    moveToCountIdx.get(mostLikely).setText(Integer.toString(motionCounter[mostLikely]));
-                    if(currentMoveEnd == 1) {
-                        //textToSpeech.speak(labels.get(mostLikely), TextToSpeech.QUEUE_ADD, null, Integer.toString(new Random().nextInt()));
+                    if(currentMoveEnd == 1 && currentMoveValidation[mostLikely] == 0) {
+                        motionCounter[mostLikely]++;
+
+                        // Training updating
+                        Movement currentMovement = intToMove(mostLikely);
+                        // Avancement d'un "pas"  dans le training
+                        trainingTest.doAMovement(currentMovement);
+    
+                        // Mise à jour de l'affichage et de l'aide vocale
+                        TextView nextMoveTextView = (TextView) findViewById(R.id.nextMoveTextView);
+                        nextMoveTextView.setText(trainingTest.getText());
+                        textToSpeech.speak(trainingTest.getTextToSpeech(), TextToSpeech.QUEUE_ADD, null);
+                        
+                        moveToCountIdx.get(mostLikely).setText(Integer.toString(motionCounter[mostLikely]));
                         ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
                         toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,150);
+                        //textToSpeech.speak(labels.get(mostLikely), TextToSpeech.QUEUE_ADD, null, Integer.toString(new Random().nextInt()));
+                        
                         currentMoveEnd = 0;
+                    }else{
+                        currentMoveValidation[mostLikely]--;
                     }
                 }else{
                     currentMoveEnd = 1;
                 }
 
-                mostLikelyTextView.setText(labels.get(mostLikely) + " " + currentMoveTime + "ms : " + motionCounter[mostLikely]);
+                mostLikelyTextView.setText(labels.get(mostLikely) + " " + currentMoveTime + "ms");
             }
             else{
                 mostLikelyTextView.setText("Not recognized for " + currentMoveTime + "ms");
@@ -396,15 +410,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private SensorManager getSensorManager() {
         return (SensorManager) getSystemService(SENSOR_SERVICE);
     }
-
+//("Jogging","Marcher","Rien","Sauter", "Squat", "360");
     private Movement intToMove(int i){
         switch (i){
             case 0 :
+                return Movement.JOGGING;
+            case 1 :
                 return Movement.WALKING;
             case 3:
-                return Movement.THREESIX;
-            case 2:
                 return Movement.JUMPING;
+            case 4:
+                return Movement.SQUAT;
+            case 5:
+                return Movement.THREESIX;
             default :
                 return Movement.NOTHING;
         }

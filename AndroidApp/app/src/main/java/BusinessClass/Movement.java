@@ -8,7 +8,8 @@ import java.util.List;
  */
 
 public enum Movement {
-
+    SQUAT ("Squat"),
+    JOGGING ("JOGGING"),
     NOTHING ("Nothing"),
     WALKING ("Walking"),
     JUMPING ("Jumping"),
