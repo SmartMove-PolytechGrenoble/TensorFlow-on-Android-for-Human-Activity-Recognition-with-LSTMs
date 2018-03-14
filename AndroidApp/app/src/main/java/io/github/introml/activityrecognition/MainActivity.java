@@ -328,13 +328,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             currentMoveTime = (currentMoveStartTime - System.nanoTime()) / 1000000;
 
             if(mostLikely != -1){
+                Movement currentMovement = intToMove(mostLikely);
                 /* Does this move needs to be counted ? */
                 if(moveToCountIdx.containsKey(mostLikely)){
                     if(currentMoveEnd == 1 && currentMoveValidation[mostLikely] == 0) {
                         motionCounter[mostLikely]++;
 
                         // Training updating
-                        Movement currentMovement = intToMove(mostLikely);
                         // Avancement d'un "pas"  dans le training
                         trainingTest.doAMovement(currentMovement);
     
@@ -353,10 +353,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                         currentMoveValidation[mostLikely]--;
                     }
                 }else{
+
+                    motionCounter[mostLikely]++;
+                    trainingTest.doAMovement(currentMovement);
                     currentMoveEnd = 1;
+
+                    TextView nextMoveTextView = (TextView) findViewById(R.id.nextMoveTextView);
+                    nextMoveTextView.setText(trainingTest.getText());
+
+                    ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+                    toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,150);
                 }
 
-                mostLikelyTextView.setText(labels.get(mostLikely) + " " + currentMoveTime + "ms");
+                mostLikelyTextView.setText(labels.get(mostLikely) + " " + motionCounter[mostLikely] + "ms");
             }
             else{
                 mostLikelyTextView.setText("Not recognized for " + currentMoveTime + "ms");

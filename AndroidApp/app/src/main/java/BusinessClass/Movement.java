@@ -9,7 +9,7 @@ import java.util.List;
 
 public enum Movement {
     SQUAT ("Squat"),
-    JOGGING ("JOGGING"),
+    JOGGING ("Jogging"),
     NOTHING ("Nothing"),
     WALKING ("Walking"),
     JUMPING ("Jumping"),
@@ -31,6 +31,8 @@ public enum Movement {
 
     public static List<Movement> getMovements(){
         List<Movement> l = new ArrayList<>();
+        l.add(SQUAT);
+        l.add(JOGGING);
         l.add(NOTHING);
         l.add(WALKING);
         l.add(JUMPING);
