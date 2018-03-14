@@ -1,5 +1,6 @@
 package io.github.introml.activityrecognition;
 
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -8,8 +9,10 @@ import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -26,6 +29,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -164,23 +168,22 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         textToSpeech = new TextToSpeech(this, this);
         textToSpeech.setLanguage(Locale.US);
 
+        generateTraining();
 
         spinner = (Spinner) findViewById(R.id.trainingChoiceSpinner);
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.training_array, android.R.layout.simple_spinner_item);
-        // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Apply the adapter to the spinner
+
+        ArrayAdapter<Training> adapter = new ArrayAdapter<Training>(getApplicationContext(), R.layout.support_simple_spinner_dropdown_item,trainings);
+        adapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+
         spinner.setAdapter(adapter);
 
-        generateTraining();
+
 
         launchTraining = (Button) findViewById(R.id.launchTrainingButton);
         launchTraining.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                trainingTest=trainings.get(spinner.getSelectedItemPosition());
+                trainingTest= (Training) spinner.getSelectedItem();
 
                 trainingTest.lauchTraining();
 
@@ -191,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         });
 
-        trainingTest=trainings.get(0);
+        trainingTest= (Training) spinner.getSelectedItem();
         TextView nextMoveTextView = (TextView) findViewById(R.id.nextMoveTextView);
         nextMoveTextView.setText("");
     }
@@ -412,32 +415,32 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         String[] trainingNames = getResources().getStringArray(R.array.training_array);
 
         Training training=new Training();
-
+        training.setName("Niveau 2");
         training.addExercice(new Exercice(Movement.JUMPING, 5));
         training.addExercice(new Exercice(Movement.THREESIX, 2));
         training.addExercice(new Exercice(Movement.WALKING, 3));
         training.addExercice(new Exercice(Movement.JUMPING, 5));
-
         trainings.add(training);
-        training=new Training();
 
+        training=new Training();
+        training.setName("Lafay");
         training.addExercice(new Exercice(Movement.WALKING, 3));
         training.addExercice(new Exercice(Movement.JUMPING, 5));
         training.addExercice(new Exercice(Movement.THREESIX, 1));
-
         trainings.add(training);
+
         training=new Training();
-
+        training.setName("ALM");
         training.addExercice(new Exercice(Movement.JUMPING, 5));
         training.addExercice(new Exercice(Movement.NOTHING, 1));
         training.addExercice(new Exercice(Movement.JUMPING, 5));
         training.addExercice(new Exercice(Movement.NOTHING, 1));
         training.addExercice(new Exercice(Movement.JUMPING, 5));
         training.addExercice(new Exercice(Movement.NOTHING, 1));
-
         trainings.add(training);
+
         training=new Training();
-
+        training.setName("SD");
         training.addExercice(new Exercice(Movement.THREESIX, 1));
         training.addExercice(new Exercice(Movement.JUMPING, 5));
         training.addExercice(new Exercice(Movement.THREESIX, 1));
@@ -445,8 +448,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         training.addExercice(new Exercice(Movement.THREESIX, 1));
 
         trainings.add(training);
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+        Map<String,?> keys = sharedPref.getAll();
+        for(Map.Entry<String,?> entry : keys.entrySet()){
+            if(entry.getKey().contains("TRAINING")){
+                Log.d("map values",entry.getKey() + ": " + entry.getValue().toString());
+                Training t = new Training(entry.getValue().toString());
+                trainings.add(t);
+            }
+        }
+
+
     }
-
 }
 
 

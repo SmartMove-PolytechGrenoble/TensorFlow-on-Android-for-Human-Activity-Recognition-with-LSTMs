@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toolbar;
 
+import BusinessClass.Training;
+
 /**
  * Created by anthony on 13/03/18.
  */
@@ -18,6 +20,7 @@ public class HomeActivity extends Activity {
 
     private Button goToTrainingMode ;
     private Button goToCreatingMode ;
+    private Button goToTrainingList ;
     private Button goAir ;
 
     @Override
@@ -40,6 +43,15 @@ public class HomeActivity extends Activity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(HomeActivity.this, CreateTrainingActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        goToTrainingList = (Button) findViewById(R.id.goToTrainingList);
+        goToTrainingList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(HomeActivity.this, TrainingListActivity.class);
                 startActivity(intent);
             }
         });

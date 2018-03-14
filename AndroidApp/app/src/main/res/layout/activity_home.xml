@@ -27,13 +27,19 @@
             android:id="@+id/goToTrainingMode"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Go to training mode" />
+            android:text="Training mode" />
 
         <Button
             android:id="@+id/goToCreatingMode"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Go to creating mode" />
+            android:text="Create training" />
+
+        <Button
+            android:id="@+id/goToTrainingList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Training list" />
 
         <Button
             android:id="@+id/goAir"

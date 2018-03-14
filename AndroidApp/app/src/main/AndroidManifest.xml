@@ -28,6 +28,10 @@
             android:name="io.github.introml.activityrecognition.CreateTrainingActivity">
         </activity>
 
+        <activity
+            android:name="io.github.introml.activityrecognition.TrainingListActivity">
+        </activity>
+
     </application>
 
 </manifest>

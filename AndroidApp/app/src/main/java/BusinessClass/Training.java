@@ -2,6 +2,8 @@ package BusinessClass;
 
 import android.util.Log;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -120,5 +122,24 @@ public class Training {
         String tmp = textToSpeech;
         textToSpeech="";
         return tmp;
+    }
+
+    public String getGSON (String trainingName){
+        this.trainingName=trainingName;
+
+        Gson gson = new Gson();
+        return gson.toJson(this);
+    }
+
+    public Training (String trainingGSon){
+
+        Gson gson = new Gson();
+        Training t  = gson.fromJson(trainingGSon, Training.class);
+        exercices=t.exercices;
+        trainingName=t.trainingName;
+    }
+
+    public String toString(){
+        return trainingName;
     }
 }

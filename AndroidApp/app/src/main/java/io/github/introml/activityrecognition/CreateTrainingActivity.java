@@ -90,7 +90,7 @@ public class CreateTrainingActivity extends Activity {
             @Override
             public void onClick(View view) {
 
-              /*  SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 SharedPreferences.Editor editor = sharedPref.edit();
 
                 String trainingName = trainingNameTextView.getText().toString();
@@ -98,9 +98,6 @@ public class CreateTrainingActivity extends Activity {
 
                 editor.putString("TRAINING" + trainingName, training.getGSON(trainingName));
                 editor.commit();
-
-
-
 
                 Map<String,?> keys = sharedPref.getAll();
                 Log.e("Test", "Bite");
@@ -117,7 +114,7 @@ public class CreateTrainingActivity extends Activity {
 
                 repetitionTextView.setText("");
                 trainingNameTextView.setText("");
-                createTraining();*/
+                createTraining();
 
             }
         });
