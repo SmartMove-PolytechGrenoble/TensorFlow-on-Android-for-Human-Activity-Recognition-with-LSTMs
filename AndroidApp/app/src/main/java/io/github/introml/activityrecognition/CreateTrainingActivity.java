@@ -125,7 +125,6 @@ public class CreateTrainingActivity extends Activity {
     private void createTraining() {
 
         training=new Training();
-        training.addExercice(new Exercice(Movement.NOTHING, 1));
 
         trainingAdapter = new TrainingAdapter(CreateTrainingActivity.this, training);
         trainingListView.setAdapter(trainingAdapter);

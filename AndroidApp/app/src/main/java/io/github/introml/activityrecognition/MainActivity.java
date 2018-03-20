@@ -71,15 +71,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private List<String> labelsToCount = Arrays.asList("Sauter", "Squat", "360");
 
     /* Corresponding validation rate x in a row */
-    private final Integer moveToCountValidation[] = {2, 2, 2, 1, 1, 1, 1};
+    private final Integer moveToCountValidation[] = {0, 0, 0, 0, 1, 1, 2};
 
-    private Integer currentMoveValidation[] = {2, 2, 2, 1, 1, 1, 1};
+    private Integer currentMoveValidation[] = {0, 0, 0, 0, 1, 1, 2};
 
     /* This array is init with zeros */
     private int[] motionCounter = new int[labels.size()];
 
     /* This is the threshhold to accept a move */
     private static final double validation = 0.98 ;
+
+    private static final double[] validationMove = {0.87, 0.97, 0.97, 0.97, 0.96, 0.93, 0.93};
 
     private static int currentMove = -1;
     private static long currentMoveTime = 0;
@@ -315,7 +317,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
             int mostLikely = mostLikely(results);
 
-            if(results[mostLikely] <= validation){
+            if(results[mostLikely] <= validationMove[mostLikely]){
                 mostLikely = -1;
                 mostLikelyTextView.setText("Not recognized");
             }
@@ -337,12 +339,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     if(currentMoveEnd == 1 && currentMoveValidation[mostLikely] == 0) {
                         motionCounter[mostLikely]++;
 
-                        // Training updating
-                        // Avancement d'un "pas"  dans le training
-                        trainingTest.doAMovement(currentMovement);
-
                         if(trainingTest.getCurrentExercice() != null) {
                             if (trainingTest.getCurrentExercice().getMovement() == intToMove(mostLikely)) {
+                                // Training updating
+                                // Avancement d'un "pas"  dans le training
+                                trainingTest.doAMovement(currentMovement);
                                 // Mise à jour de l'affichage et de l'aide vocale
                                 TextView nextMoveTextView = (TextView) findViewById(R.id.nextMoveTextView);
                                 nextMoveTextView.setText(trainingTest.getText());
@@ -487,6 +488,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         training.addExercice(new Exercice(Movement.JUMPING, 5));
         training.addExercice(new Exercice(Movement.THREESIX, 1));
 
+        trainings.add(training);
+
+        training=new Training();
+        training.setName("Iron Man Demo");
+        training.addExercice(new Exercice(Movement.SQUAT, 3));
+        training.addExercice(new Exercice(Movement.JOGGING, 10));
+        training.addExercice(new Exercice(Movement.WALKING, 10));
+        training.addExercice(new Exercice(Movement.JOGGING, 10));
+        training.addExercice(new Exercice(Movement.WALKING, 10));
+        training.addExercice(new Exercice(Movement.PASC, 10));
+        training.addExercice(new Exercice(Movement.JUMPING, 5));
+        training.addExercice(new Exercice(Movement.THREESIX, 2));
+        training.addExercice(new Exercice(Movement.PASC, 10));
+        training.addExercice(new Exercice(Movement.WALKING, 10));
         trainings.add(training);
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
